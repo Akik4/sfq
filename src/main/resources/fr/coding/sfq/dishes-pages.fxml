@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:id="dishPane" fx:controller="fr.coding.sfq.DisheController">
+    <VBox spacing="10" alignment="CENTER">
+        <Label text="Liste des Plats" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+        <TableView fx:id="dishTable">
+            <columns>
+                <TableColumn text="Nom" fx:id="nameColumn" />
+                <TableColumn text="Description" fx:id="descriptionColumn" />
+                <TableColumn text="Prix" fx:id="priceColumn" />
+                <TableColumn text="Image" fx:id="imageColumn" />
+            </columns>
+        </TableView>
+
+        <Button text="Afficher Détails" fx:id="detailButton" />
+    </VBox>
+</AnchorPane>
+

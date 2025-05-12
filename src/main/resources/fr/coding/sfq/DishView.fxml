@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.DishController">
+    <top>
+        <HBox spacing="10">
+            <Label text="Liste des Plats" style="-fx-font-size: 20px; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
+            <Button text="Accueil" fx:id="homeButton"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TableView fx:id="dishTable">
+            <columns>
+                <TableColumn text="Nom" fx:id="nameColumn"/>
+                <TableColumn text="Description" fx:id="descriptionColumn"/>
+                <TableColumn text="Prix" fx:id="priceColumn"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Ajouter un plat" fx:id="addDishButton"/>
+            <Button text="Supprimer un plat" fx:id="removeDishButton"/>
+        </HBox>
+    </bottom>
+</BorderPane>

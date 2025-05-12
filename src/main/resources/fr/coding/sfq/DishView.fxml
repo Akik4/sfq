@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.DishController">
     <top>
         <HBox spacing="10">
-            <Label text="Liste des Plats" style="-fx-font-size: 20px; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
+            <Label text="Menu du Restaurant" style="-fx-font-size: 24px; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
             <Button text="Accueil" fx:id="homeButton"/>
         </HBox>
     </top>
 
     <center>
-        <TableView fx:id="dishTable">
-            <columns>
-                <TableColumn text="Nom" fx:id="nameColumn"/>
-                <TableColumn text="Description" fx:id="descriptionColumn"/>
-                <TableColumn text="Prix" fx:id="priceColumn"/>
-            </columns>
-        </TableView>
+        <ScrollPane fitToWidth="true">
+            <FlowPane fx:id="dishGrid" hgap="15" vgap="15"/>
+        </ScrollPane>
     </center>
 
     <bottom>
-        <HBox spacing="10" alignment="CENTER">
-            <Button text="Ajouter un plat" fx:id="addDishButton"/>
-            <Button text="Supprimer un plat" fx:id="removeDishButton"/>
-        </HBox>
+        <VBox spacing="10" alignment="CENTER">
+            <HBox spacing="10">
+                <TextField fx:id="nameField" promptText="Nom du plat"/>
+                <TextField fx:id="descriptionField" promptText="Description"/>
+                <TextField fx:id="priceField" promptText="Prix"/>
+                <Button text="Ajouter" fx:id="submitDishButton"/>
+            </HBox>
+        </VBox>
     </bottom>
 </BorderPane>

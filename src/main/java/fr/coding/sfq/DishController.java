@@ -1,6 +1,8 @@
 package fr.coding.sfq;
 
 import fr.coding.sfq.models.Dishes;
+import fr.coding.sfq.models.DishesEntity;
+import fr.coding.sfq.util.HibernateUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,6 +15,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,6 +76,18 @@ public class DishController {
         });
 
         dishGrid.getChildren().add(dishCard); // Add new dish card to the FlowPane
+
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+
+            DishesEntity dish = new DishesEntity(name, description, price, "");
+            session.save(dish);
+
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Dishes Dnew = new Dishes(name, description, price, "");
         dishes.add(Dnew);

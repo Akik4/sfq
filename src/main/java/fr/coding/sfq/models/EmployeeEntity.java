@@ -15,29 +15,34 @@ public class EmployeeEntity {
     private String name;
 
     @Column
-    private String job;
-
-    @Column
     private double hoursWorked;
 
     @Column
-    private int age;
+    private String position;
+
+    @Column
+    private Integer age;
 
     public EmployeeEntity() {}
-    public EmployeeEntity(String name, String job, double hoursWorked, int age) {
+    public EmployeeEntity(String name, double hoursWorked, String position, int age) {
         this.name = name;
-        this.job = job;
         this.hoursWorked = hoursWorked;
+        this.position = position;
         this.age = age;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setJob(String job) {
-        this.job = job;
-    }
 
     public void setHoursWorked(double hoursWorked) {
         this.hoursWorked = hoursWorked;
@@ -55,9 +60,6 @@ public class EmployeeEntity {
         return name;
     }
 
-    public String getJob() {
-        return job;
-    }
 
     public double getHoursWorked() {
         return hoursWorked;

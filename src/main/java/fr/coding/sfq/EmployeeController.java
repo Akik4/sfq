@@ -18,10 +18,12 @@ public class EmployeeController {
     @FXML private TableColumn<Employee, String> employeeNameColumn;
     @FXML private TableColumn<Employee, String> employeePositionColumn;
     @FXML private TableColumn<Employee, Number> employeeWorkHoursColumn;
+    @FXML private TableColumn<Employee, Number> employeeAgeColumn;
     @FXML private TableColumn<Employee, Void> actionsColumn;
 
     @FXML private TextField employeeNameField;
     @FXML private TextField employeePositionField;
+    @FXML private TextField employeeAgeField;
     @FXML private Button createEmployeeButton;
 
     @FXML private Button homeButton;
@@ -33,6 +35,7 @@ public class EmployeeController {
         employeeNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         employeePositionColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPosition()));
         employeeWorkHoursColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getWorkHours()));
+        employeeAgeColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getAge()));
         employeeTable.setItems(employees);
 
         createEmployeeButton.setOnAction(event -> createTable());
@@ -49,21 +52,24 @@ public class EmployeeController {
     private void createTable() {
         String employeeName;
         String employeePostion;
+        String employeeAge;
 
         try {
             employeeName = employeeNameField.getText();
             employeePostion = employeePositionField.getText();
+            employeeAge = employeeAgeField.getText();
         } catch (NumberFormatException e) {
-            System.out.println("Nom ou poste de l'employé invalide");
+            System.out.println("Informations invalides");
             return;
         }
 
-        Employee newEmployee = new Employee(employeeName, 0, employeePostion);
+        Employee newEmployee = new Employee(employeeName, 0, employeePostion, Integer.parseInt(employeeAge));
         employees.add(newEmployee);
-        employeeTable.refresh(); // Refresh TableView to show new tables
+        employeeTable.refresh();
 
         employeeNameField.clear();
         employeePositionField.clear();
+        employeeAgeField.clear();
     }
 
     private void addActionsToTable() {

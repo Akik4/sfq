@@ -15,6 +15,7 @@
             <columns>
                 <TableColumn text="Nom" fx:id="employeeNameColumn"/>
                 <TableColumn text="Poste" fx:id="employeePositionColumn"/>
+                <TableColumn text="Age" fx:id="employeeAgeColumn"/>
                 <TableColumn text="Nombre d'Heures Travaillées" fx:id="employeeWorkHoursColumn"/>
                 <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="120"/>
             </columns>
@@ -26,6 +27,7 @@
             <Label text="Ajouter un employé" style="-fx-font-size: 18px;"/>
             <TextField fx:id="employeeNameField" promptText="Nom"/>
             <TextField fx:id="employeePositionField" promptText="Poste"/>
+            <TextField fx:id="employeeAgeField" promptText="Age"/>
             <Button text="Créer" fx:id="createEmployeeButton"/>
         </HBox>
 

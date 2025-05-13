@@ -32,6 +32,10 @@ public class Tables {
         return occupied;
     }
 
+    public void setOccupied(boolean occupied) {
+        this.occupied = occupied;
+    }
+
     public List<Orders> getOrders() {
         return orders;
     }

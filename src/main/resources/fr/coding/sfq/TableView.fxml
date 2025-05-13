@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.TablesController">
+    <top>
+        <HBox spacing="10">
+            <Label text="Tables du Restaurant" style="-fx-font-size: 24px; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
+            <Button text="Accueil" fx:id="homeButton"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TableView fx:id="tablesTable">
+            <columns>
+                <TableColumn text="Numéro" fx:id="tableNumberColumn"/>
+                <TableColumn text="Statut" fx:id="statusColumn"/>
+                <TableColumn text="Commande Assignée" fx:id="assignedOrderColumn"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Marquer Disponible" fx:id="markAvailableButton"/>
+            <Button text="Marquer Occupé" fx:id="markOccupiedButton"/>
+            <Button text="Assigner Commande" fx:id="assignOrderButton"/>
+        <Label text="Ajouter une Table" style="-fx-font-size: 18px;"/>
+            <TextField fx:id="tableNumberField" promptText="Numéro de table"/>
+            <Button text="Créer" fx:id="createTableButton"/>
+        </HBox>
+
+    </bottom>
+</BorderPane>

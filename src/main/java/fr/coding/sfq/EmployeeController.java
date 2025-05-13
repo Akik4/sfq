@@ -72,11 +72,12 @@ public class EmployeeController {
             public TableCell<Employee, Void> call(final TableColumn<Employee, Void> param) {
                 return new TableCell<>() {
 
-                    private final Button addHoursBtn = new Button("Ajouter Heures Travaillées");
-                    private final Button deleteBtn = new Button("Virer l'employé");
+                    private final Button addHoursBtn = new Button("Ajouter Heures");
+                    private final Button deleteBtn = new Button("Virer");
                     private final HBox pane = new HBox(5, addHoursBtn, deleteBtn);
 
                     {
+                        addHoursBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
                         addHoursBtn.setOnAction(event -> {
                             Employee employee = getTableView().getItems().get(getIndex());
 
@@ -96,6 +97,7 @@ public class EmployeeController {
                             });
                         });
 
+                        deleteBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
                         deleteBtn.setOnAction(event -> {
                             Employee employee = getTableView().getItems().get(getIndex());
                             employees.remove(employee);

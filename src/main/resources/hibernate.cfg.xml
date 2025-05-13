@@ -1,0 +1,20 @@
+<hibernate-configuration>
+    <session-factory>
+        <!-- MariaDB Connection Settings -->
+        <property name="hibernate.connection.driver_class">org.mariadb.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mariadb://185.143.103.102:3307/sfq</property>
+        <property name="hibernate.connection.username">admin</property>
+        <property name="hibernate.connection.password">admin</property>
+
+        <!-- Hibernate properties -->
+        <property name="hibernate.dialect">org.hibernate.dialect.MariaDBDialect</property>
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- List your annotated entity classes -->
+        <mapping class="fr.coding.sfq.models.DishesEntity"/>
+        <mapping class="fr.coding.sfq.models.TablesEntity"/>
+        <mapping class="fr.coding.sfq.models.OrdersEntity"/>
+        <mapping class="fr.coding.sfq.models.EmployeeEntity"/>
+    </session-factory>
+</hibernate-configuration>

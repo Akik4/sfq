@@ -12,6 +12,7 @@ module fr.coding.sfq {
     requires jakarta.persistence;
     requires org.checkerframework.checker.qual;
     requires jakarta.interceptor;
+    requires com.github.librepdf.openpdf;
 
     opens fr.coding.sfq to javafx.fxml;
     exports fr.coding.sfq;

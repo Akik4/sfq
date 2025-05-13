@@ -24,7 +24,7 @@
         <HBox spacing="10" alignment="CENTER">
             <Button text="Marquer Disponible" fx:id="markAvailableButton"/>
             <Button text="Marquer Occupé" fx:id="markOccupiedButton"/>
-            <Button text="Assigner Commande" fx:id="assignOrderButton"/>
+            <Button text="Créer Commande" fx:id="assignOrderButton"/>
         <Label text="Ajouter une Table" style="-fx-font-size: 18px;"/>
             <TextField fx:id="tableNumberField" promptText="Numéro de table"/>
             <Button text="Créer" fx:id="createTableButton"/>

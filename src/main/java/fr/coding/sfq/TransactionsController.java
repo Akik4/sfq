@@ -18,6 +18,8 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import com.lowagie.text.pdf.PdfPCell;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,6 +58,7 @@ public class TransactionsController {
         // Fonction qui Select toute la BDD et qui Add a la liste qui affiche les transactions
         loadTransactionsFromDatabase();
 
+        //Brut pour essayer l'insert BDD
         addIncome(120.0, "Paiement table 1");
         addExpense(45.0, "Salaire employé");
         addIncome(90.0, "Paiement table 2");
@@ -95,20 +98,6 @@ public class TransactionsController {
         }
     }
 
-    public double getTotalIncome() {
-        return transactions.stream()
-                .filter(t -> t.getType() == TransactionEntity.Type.INCOME)
-                .mapToDouble(TransactionEntity::getAmount)
-                .sum();
-    }
-
-    public double getTotalExpense() {
-        return transactions.stream()
-                .filter(t -> t.getType() == TransactionEntity.Type.EXPENSE)
-                .mapToDouble(TransactionEntity::getAmount)
-                .sum();
-    }
-
     // pour transformer Income et Expense en Recette et Depense pour le visuel en Francais dans le front
     private String getTypeLabel(TransactionEntity.Type type) {
         return switch (type) {
@@ -118,44 +107,112 @@ public class TransactionsController {
     }
 
     private void generatePdf() {
+        // Ouvre un pop up opur choisir où enregistrer le fichier
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Enregistrer le PDF des transactions");
         fileChooser.setInitialFileName("transactions.pdf");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF files", "*.pdf"));
 
+
         File file = fileChooser.showSaveDialog(transactionsTable.getScene().getWindow());
-        if (file == null) return;
+        if (file == null) return; // Si l'user quitte on ferme tout
 
         try {
             Document document = new Document();
             PdfWriter.getInstance(document, new FileOutputStream(file));
             document.open();
 
+            // Ajout du titre au pdf
             document.add(new Paragraph("Historique des transactions\n\n"));
 
+            // Création du tableau à 4 colonnes
             PdfPTable table = new PdfPTable(4);
+            // Style du tableau
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
             table.setSpacingAfter(10f);
 
-            table.addCell("Type");
-            table.addCell("Date");
-            table.addCell("Montant (€)");
-            table.addCell("Description");
-
-            for (TransactionEntity t : transactions) {
-                table.addCell(getTypeLabel(t.getType()));
-                table.addCell(t.getTimestamp().format(formatter));
-                table.addCell(String.format("%.2f", t.getAmount()));
-                table.addCell(t.getDescription());
+            // headers du tableau
+            String[] headers = {"Type", "Date", "Montant (€)", "Description"};
+            for (String header : headers) {
+                PdfPCell headerCell = new PdfPCell(new Paragraph(header));
+                // Style des cellules
+                headerCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                headerCell.setPadding(10f);
+                table.addCell(headerCell);
             }
 
+            // Variable pour compter le resultat des transactions
+            double totalIncome = 0;
+            double totalExpense = 0;
+
+            for (TransactionEntity t : transactions) {
+                PdfPCell typeCell = new PdfPCell(new Paragraph(getTypeLabel(t.getType())));
+                typeCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                typeCell.setPadding(8f);
+                table.addCell(typeCell);
+
+                PdfPCell dateCell = new PdfPCell(new Paragraph(t.getTimestamp().format(formatter)));
+                dateCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                dateCell.setPadding(8f);
+                table.addCell(dateCell);
+
+                // Cellule Montant different car rajout couleur en fonction de Income ou Expense + ajout montant a la variable du debut
+                Paragraph amountPara = new Paragraph(String.format("%.2f €", t.getAmount()));
+                if (t.getType() == TransactionEntity.Type.INCOME) {
+                    amountPara.getFont().setColor(0, 128, 0);
+                    totalIncome += t.getAmount();
+                } else {
+                    amountPara.getFont().setColor(200, 0, 0);
+                    totalExpense += t.getAmount();
+                }
+                PdfPCell amountCell = new PdfPCell(amountPara);
+                amountCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                amountCell.setPadding(8f);
+                table.addCell(amountCell);
+
+                PdfPCell descCell = new PdfPCell(new Paragraph(t.getDescription()));
+                descCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                descCell.setPadding(8f);
+                table.addCell(descCell);
+            }
+
+            // Ajout le tableau au pdf
             document.add(table);
+            document.add(new Paragraph("\nRécapitulatif :\n"));
+
+            // Ligne "Total Recettes"
+            Paragraph incomeLine = new Paragraph();
+            com.lowagie.text.Font greenFont = new com.lowagie.text.Font();
+            greenFont.setColor(0, 128, 0);
+            incomeLine.add(new com.lowagie.text.Chunk("Total ", greenFont));
+            incomeLine.add(new com.lowagie.text.Chunk("Recettes", greenFont));
+            incomeLine.add(new com.lowagie.text.Chunk(String.format(" : %.2f €", totalIncome), greenFont));
+            document.add(incomeLine);
+
+            // Ligne "Total Dépenses"
+            Paragraph expenseLine = new Paragraph();
+            com.lowagie.text.Font redFont = new com.lowagie.text.Font();
+            redFont.setColor(200, 0, 0);
+            expenseLine.add(new com.lowagie.text.Chunk("Total ", redFont));
+            expenseLine.add(new com.lowagie.text.Chunk("Dépenses", redFont));
+            expenseLine.add(new com.lowagie.text.Chunk(String.format(" : %.2f €", totalExpense), redFont));
+            document.add(expenseLine);
+
+            // Calcul + affichage du resultat
+            double balance = totalIncome - totalExpense;
+            Paragraph balanceLine = new Paragraph("Solde Final : " + String.format("%.2f €", balance));
+            balanceLine.setSpacingBefore(5f);
+            document.add(balanceLine);
+
             document.close();
-            System.out.println("PDF généré : " + file.getAbsolutePath());
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
+
+
 }

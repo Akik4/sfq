@@ -140,6 +140,10 @@ public class TablesController {
                 mainLayout.getChildren().add(dishCard);
             }
 
+            Button createOrderButton = new Button("Create Table");
+            createOrderButton.setStyle("-fx-font-size: 14px;");
+            createOrderButton.setOnAction(e -> createOrder());
+
             Button closeButton = new Button("Fermer");
             closeButton.setStyle("-fx-font-size: 14px;");
             closeButton.setOnAction(event -> detailStage.close());
@@ -174,6 +178,10 @@ public class TablesController {
         tablesTable.refresh(); // Refresh TableView to show new tables
 
         tableNumberField.clear();
+    }
+
+    private void createOrder() {
+        System.out.println("AHAHAHAHAHAHAHAHAH");
     }
 
 }

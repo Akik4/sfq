@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.TransactionsController">
+
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+            <Label text="Transactions" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+            <Button fx:id="homeButton" text="Accueil" />
+            <Button fx:id="downloadPdfButton" text="Télécharger le PDF" />
+        </HBox>
+    </top>
+
+    <center>
+        <TableView fx:id="transactionsTable" prefHeight="400" prefWidth="600">
+            <columns>
+                <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
+                <TableColumn fx:id="dateColumn" text="Date" prefWidth="180"/>
+                <TableColumn fx:id="amountColumn" text="Prix (€)" prefWidth="100"/>
+                <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="220"/>
+            </columns>
+        </TableView>
+    </center>
+
+</BorderPane>

@@ -6,6 +6,7 @@ module fr.coding.sfq {
     requires com.dlsc.formsfx;
     requires org.kordamp.bootstrapfx.core;
     requires java.desktop;
+    requires com.github.librepdf.openpdf;
 
     opens fr.coding.sfq to javafx.fxml;
     exports fr.coding.sfq;

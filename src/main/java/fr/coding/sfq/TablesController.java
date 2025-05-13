@@ -1,8 +1,10 @@
 package fr.coding.sfq;
 
 import fr.coding.sfq.models.Dishes;
+import fr.coding.sfq.models.DishesEntity;
 import fr.coding.sfq.models.Orders;
 import fr.coding.sfq.models.Tables;
+import fr.coding.sfq.util.HibernateUtil;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.fxml.FXML;
@@ -17,6 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.hibernate.Session;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +42,7 @@ public class TablesController {
     @FXML private Button homeButton;
 
     private ObservableList<Tables> tables = FXCollections.observableArrayList();
-    private ObservableList<Dishes> dishes = FXCollections.observableArrayList();
+    private List<DishesEntity> dishes = FXCollections.observableArrayList();
 
 
     @FXML
@@ -81,14 +84,11 @@ public class TablesController {
 //            selectedTable.setAssignedOrder("Commande #" + (int)(Math.random() * 100));
             tablesTable.refresh();
 
-            Dishes Dnew = new Dishes("name", "description", 0, "");
-            Dishes Dnew2 = new Dishes("name2", "description2", 2, "");
-            Dishes Dnew3 = new Dishes("name3", "description3", 3, "");
-
-
-            dishes.add(Dnew);
-            dishes.add(Dnew2);
-            dishes.add(Dnew3);
+            try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                dishes = session.createQuery("FROM DishesEntity", DishesEntity.class).list();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
 
             Stage detailStage = new Stage();
@@ -99,7 +99,7 @@ public class TablesController {
 
             IntegerProperty totalPrice = new SimpleIntegerProperty(0);
 
-            for (Dishes dish : dishes) {
+            for (DishesEntity dish : dishes) {
                 VBox dishCard = new VBox(10);
                 dishCard.setStyle("-fx-padding: 15; -fx-border-color: black; -fx-background-color: white;");
 
@@ -123,14 +123,14 @@ public class TablesController {
                 plusButton.setOnAction(e -> {
                     int currentQty = Integer.parseInt(quantityText.getText());
                     quantityText.setText(String.valueOf(currentQty + 1));
-                    totalPrice.set(totalPrice.get() + dish.getPrice());
+                    totalPrice.set(totalPrice.get() + (int) dish.getPrice());
                 });
 
                 minusButton.setOnAction(e -> {
                     int currentQty = Integer.parseInt(quantityText.getText());
                     if (currentQty > 0) {
                         quantityText.setText(String.valueOf(currentQty - 1));
-                        totalPrice.set(totalPrice.get() - dish.getPrice());
+                        totalPrice.set(totalPrice.get() - (int) dish.getPrice());
                     }
                 });
 

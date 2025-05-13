@@ -30,13 +30,26 @@ public class DishController {
     @FXML private TextField descriptionField;
     @FXML private TextField priceField;
 
+    private List<DishesEntity> dishes = FXCollections.observableArrayList();
+
     @FXML
     public void initialize() {
         submitDishButton.setOnAction(event -> addDish());
         homeButton.setOnAction(event -> MainController.getInstance().switchView("HomePage.fxml"));
+
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            dishes = session.createQuery("FROM DishesEntity", DishesEntity.class).list();
+
+            dishes.stream().forEach((dish) -> {
+                displayDish(dish.getName(), dish.getDescription(), (int) dish.getPrice());
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 
-    private ObservableList<Dishes> dishes = FXCollections.observableArrayList();
 
     private void addDish() {
         String name = nameField.getText();
@@ -50,6 +63,30 @@ public class DishController {
             return;
         }
 
+        displayDish(name, description, price);
+
+        DishesEntity dish = new DishesEntity();
+
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+
+            dish = new DishesEntity(name, description, price, "");
+            session.save(dish);
+
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        dishes.add(dish);
+
+        nameField.clear();
+        descriptionField.clear();
+        priceField.clear();
+    }
+
+    private void displayDish(String name, String description, int price) {
         // Create dish card dynamically
         VBox dishCard = new VBox(10);
         dishCard.setStyle("-fx-padding: 10; -fx-border-color: black; -fx-background-color: #f8f8f8; -fx-border-radius: 5;");
@@ -63,7 +100,7 @@ public class DishController {
         Text dishPrice = new Text(price + " €");
         dishPrice.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: green;");
 
-        ImageView dishImage = new ImageView(new Image("file:src/main/resources/images/placeholder.jpg"));
+        ImageView dishImage = new ImageView(getClass().getResource("/images/placeholder.png").toExternalForm());
         dishImage.setFitWidth(120);
         dishImage.setFitHeight(120);
 
@@ -76,34 +113,12 @@ public class DishController {
         });
 
         dishGrid.getChildren().add(dishCard); // Add new dish card to the FlowPane
-
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            DishesEntity dish = new DishesEntity(name, description, price, "");
-            session.save(dish);
-
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        Dishes Dnew = new Dishes(name, description, price, "");
-        dishes.add(Dnew);
-
-        nameField.clear();
-        descriptionField.clear();
-        priceField.clear();
     }
 
     private void showDishDetails(String name) {
-        System.out.println(dishes.size() + " dishes");
-        List<Dishes> matchingDishes = dishes.stream()
+        List<DishesEntity> matchingDishes = dishes.stream()
                 .filter(dish -> dish.getName().equals(name))
                 .collect(Collectors.toList());
-
-        System.out.println("Found dishes: " + matchingDishes.size());
 
         matchingDishes.stream().findFirst().ifPresent(dish -> {
             Stage detailStage = new Stage();

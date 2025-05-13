@@ -10,4 +10,6 @@
     <Label text="Bienvenue au Restaurant" style="-fx-font-size: 20px;"/>
     <Button text="Voir les plats" fx:id="goToDishesButton"/>
     <Button text="Gérer les Tables" fx:id="tablesButton"/>
+    <Button text="Gérer les Employés" fx:id="employeeButton"/>
+
 </VBox>

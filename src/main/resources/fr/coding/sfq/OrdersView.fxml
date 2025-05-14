@@ -15,10 +15,11 @@
         <TableView fx:id="orderTable">
             <columns>
                 <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
+                <TableColumn fx:id="tableColumn" text="Table" prefWidth="180"/>
                 <TableColumn fx:id="dateColumn" text="Date" prefWidth="180"/>
                 <TableColumn fx:id="statusColumn" text="Statut" prefWidth="100"/>
                 <TableColumn fx:id="priceColumn" text="Prix (€)" prefWidth="100"/>
-                <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="160"/>
+                <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="360"/>
             </columns>
         </TableView>
     </center>

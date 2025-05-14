@@ -1,6 +1,5 @@
-package fr.coding.sfq;
+package fr.coding.sfq.controllers;
 
-import fr.coding.sfq.models.DishesEntity;
 import fr.coding.sfq.models.EmployeeEntity;
 import fr.coding.sfq.util.HibernateUtil;
 import javafx.scene.control.*;
@@ -9,7 +8,6 @@ import javafx.scene.layout.HBox;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import org.hibernate.Session;

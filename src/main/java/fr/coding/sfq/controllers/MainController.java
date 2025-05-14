@@ -1,10 +1,9 @@
-package fr.coding.sfq;
+package fr.coding.sfq.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -41,7 +40,7 @@ public class MainController {
 
     public void switchView(String fxml) {
         try {
-            Parent view = FXMLLoader.load(getClass().getResource(fxml));
+            Parent view = FXMLLoader.load(getClass().getResource("/fr/coding/sfq/"+fxml));
             contentPane.getChildren().setAll(view); // Replace content properly
         } catch (IOException e) {
             e.printStackTrace();

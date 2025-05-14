@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.DashboardController"
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.controllers.DashboardController"
       spacing="10" alignment="CENTER_LEFT">
 
     <Label text="Stats Employés" style="-fx-font-weight: bold;"/>

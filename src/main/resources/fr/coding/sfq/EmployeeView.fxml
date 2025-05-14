@@ -2,7 +2,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.EmployeeController">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.controllers.EmployeeController">
     <top>
         <HBox spacing="10">
             <Label text="Liste des Employés" style="-fx-font-size: 24px; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>

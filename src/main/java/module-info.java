@@ -19,4 +19,6 @@ module fr.coding.sfq {
     exports fr.coding.sfq.util;
     opens fr.coding.sfq.util to javafx.fxml;
     opens fr.coding.sfq.models to org.hibernate.orm.core;
+    exports fr.coding.sfq.controllers;
+    opens fr.coding.sfq.controllers to javafx.fxml;
 }

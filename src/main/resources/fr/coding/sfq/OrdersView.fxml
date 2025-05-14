@@ -18,6 +18,7 @@
                 <TableColumn fx:id="dateColumn" text="Date" prefWidth="180"/>
                 <TableColumn fx:id="statusColumn" text="Statut" prefWidth="100"/>
                 <TableColumn fx:id="priceColumn" text="Prix (€)" prefWidth="100"/>
+                <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="160"/>
             </columns>
         </TableView>
     </center>

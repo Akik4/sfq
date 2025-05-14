@@ -42,6 +42,10 @@ public class OrdersEntity {
         return status;
     }
 
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
     public double getPrice() {
         return price;
     }

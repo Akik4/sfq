@@ -1,9 +1,9 @@
 package fr.coding.sfq.controllers;
 
+import fr.coding.sfq.models.OrderDishiesEntity;
 import fr.coding.sfq.models.OrdersEntity;
 import fr.coding.sfq.models.TablesEntity;
 import fr.coding.sfq.util.HibernateUtil;
-import jakarta.persistence.Column;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -11,20 +11,16 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.text.Text;
 import org.hibernate.Session;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +39,7 @@ public class AllDashboardController {
     private GridPane tableGrid;
 
     @FXML
-    private VBox mine;
+    private HBox mine;
 
     @FXML
     private VBox inProgressOrdersList;
@@ -54,21 +50,25 @@ public class AllDashboardController {
     @FXML
     private Label finishedTotalLabel;
 
-    ObservableList<TablesEntity> orders = FXCollections.observableArrayList();
+    ObservableList<TablesEntity> tableOrder = FXCollections.observableArrayList();
     ObservableList<TablesEntity> tables = FXCollections.observableArrayList();
+    ObservableList<OrdersEntity> orders = FXCollections.observableArrayList();
+
 
     public void initialize() {
         Platform.runLater(() -> {
             try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-                orders = FXCollections.observableArrayList(session.createQuery("FROM TablesEntity o JOIN OrdersEntity t ON t.id = o.order.id", TablesEntity.class).stream().collect(Collectors.toList()));
+                tableOrder = FXCollections.observableArrayList(session.createQuery("FROM TablesEntity o JOIN OrdersEntity t ON t.id = o.order.id", TablesEntity.class).stream().collect(Collectors.toList()));
+                orders = FXCollections.observableArrayList(session.createQuery("FROM OrdersEntity o", OrdersEntity.class).stream().collect(Collectors.toList()));
                 tables = FXCollections.observableArrayList(session.createQuery("FROM TablesEntity ", TablesEntity.class).stream().collect(Collectors.toList()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             loadOrders();
-            loadTableStatuses();
+            loadLastClient();
             loadRecentOrders();
+            loadLastOrder();
         });
     }
 
@@ -78,38 +78,67 @@ public class AllDashboardController {
         OrderID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getOrder().getId()).asObject());
         Status.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue().isOccupied()));
 
-        ordersTable.setItems(orders);
+        ordersTable.setItems(tableOrder);
     }
 
-    private void loadTableStatuses() {
-        // Fetch table statuses and update tableStatusGrid
-        System.out.println(orders.size());
-        tables.stream().filter(TablesEntity::isOccupied).map(TablesEntity::getLocation).forEach(fn -> {
-                    HBox box = new HBox();
+    private void loadLastClient() {
+        VBox box = new VBox();
+        Label titre = new Label("Commande servie : ");
 
-                    box.getChildren().add(new Label(fn));
+        box.getChildren().add(titre);
+        tables.stream().filter(TablesEntity::isOccupied).filter(fn -> fn.getOrder().getStatus()).limit(5).forEach(fn -> {
 
-                    box.getChildren().add(new Circle(10, Color.GREEN));
+            Label label = new Label(fn.getLocation() + " : ");
 
-                    mine.getChildren().add(box);
-//                tableGrid.add(new Text("test"), 1, 1);
-                }
-        );
+            List<OrderDishiesEntity> orderDishies = FXCollections.observableArrayList();
 
-        tables.stream().filter(fn -> !fn.isOccupied()).map(TablesEntity::getLocation).forEach(fn -> {
-            HBox box = new HBox();
+            System.out.println(fn.getOrder().getId());
 
-            box.getChildren().add(new Label(fn));
+            try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                orderDishies = FXCollections.observableArrayList(session.createQuery("FROM OrderDishiesEntity o JOIN DishesEntity d ON d.id = o.dish.id WHERE o.order.id = :orderId", OrderDishiesEntity.class).setParameter("orderId", fn.getOrder().getId()).stream().collect(Collectors.toList()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-            box.getChildren().add(new Circle(10, Color.RED));
+            box.getChildren().add(label);
+
+            orderDishies.stream().map(OrderDishiesEntity::getDish).forEach(dish -> {
+                Label ldish = new Label();
+                ldish.setText("     - " + dish.getName());
+                box.getChildren().add(ldish);
+            });
+
+            mine.getChildren().add(box);
+
+        });
+    }
+
+    private void loadLastOrder() {
+        VBox box = new VBox();
+        Label titre = new Label("Commande à servir : ");
+        box.getChildren().add(titre);
+        orders.stream().filter(fn -> !fn.getStatus()).sorted(Comparator.comparingInt(OrdersEntity::getId).reversed()).limit(5).forEach(fn -> {
+
+            List<OrderDishiesEntity> orderDishies = FXCollections.observableArrayList();
+
+            try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                orderDishies = FXCollections.observableArrayList(session.createQuery("FROM OrderDishiesEntity o JOIN DishesEntity d ON d.id = o.dish.id WHERE o.order.id = :orderId", OrderDishiesEntity.class).setParameter("orderId", fn.getId()).stream().collect(Collectors.toList()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Label label = new Label(String.valueOf(fn.getId()));
+
+            box.getChildren().add(label);
+
+            orderDishies.stream().map(OrderDishiesEntity::getDish).forEach(dish -> {
+                Label ldish = new Label();
+                ldish.setText("     - " + dish.getName());
+                box.getChildren().add(ldish);
+            });
 
             mine.getChildren().add(box);
         });
-        orders.stream().map(TablesEntity::getLocation).forEach(fn -> {
-                    mine.getChildren().add(new Label(fn));
-//                tableGrid.add(new Text("test"), 1, 1);
-                }
-        );
     }
 
     private void loadRecentOrders() {

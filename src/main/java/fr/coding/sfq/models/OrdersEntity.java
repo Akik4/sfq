@@ -37,4 +37,7 @@ public class OrdersEntity {
     public Date getDate() {
         return date;
     }
+    public  double getPrice() {
+        return price;
+    }
 }

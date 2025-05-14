@@ -7,6 +7,7 @@ import fr.coding.sfq.models.Tables;
 import fr.coding.sfq.util.HibernateUtil;
 import fr.coding.sfq.models.*;
 import fr.coding.sfq.util.HibernateUtil;
+import fr.coding.sfq.util.OrderDetailsPopupUtil;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.fxml.FXML;
@@ -62,6 +63,21 @@ public class TablesController {
             return new SimpleStringProperty(order != null ? "Commande #" + order.getId() : "Aucune");
         });
         tablesTable.setItems(tables);
+
+        tablesTable.setRowFactory(tv -> {
+            TableRow<TablesEntity> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    TablesEntity selectedTable = row.getItem();
+                    OrdersEntity order = selectedTable.getOrder();
+
+                    if (order != null) {
+                        OrderDetailsPopupUtil.show(order);
+                    }
+                }
+            });
+            return row;
+        });
 
         markAvailableButton.setOnAction(event -> markTableAvailable());
         markOccupiedButton.setOnAction(event -> markTableOccupied());

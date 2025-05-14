@@ -1,9 +1,9 @@
 package fr.coding.sfq.controllers;
 
 import fr.coding.sfq.models.DishesEntity;
+import fr.coding.sfq.util.CountdownTimerUtil;
 import fr.coding.sfq.util.HibernateUtil;
 import fr.coding.sfq.models.*;
-import fr.coding.sfq.util.HibernateUtil;
 import fr.coding.sfq.util.OrderDetailsPopupUtil;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -38,21 +38,17 @@ public class TablesController {
     @FXML private Button assignOrderButton;
     @FXML private TextField tableNumberField;
     @FXML private Button createTableButton;
-
-
-
     @FXML private Button homeButton;
 
     private ObservableList<TablesEntity> tables = FXCollections.observableArrayList();
     private List<DishesEntity> dishes = FXCollections.observableArrayList();
 
-
     @FXML
     public void initialize() {
         tableNumberColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLocation()));
         statusColumn.setCellValueFactory(cellData -> {
-                TablesEntity table = cellData.getValue();
-                return new SimpleStringProperty(table.isOccupied() ? "Occupé" : "Disponible");
+            TablesEntity table = cellData.getValue();
+            return new SimpleStringProperty(table.isOccupied() ? "Occupé" : "Disponible");
         });
         assignedOrderColumn.setCellValueFactory(cellData -> {
             OrdersEntity order = cellData.getValue().getOrder();
@@ -75,13 +71,23 @@ public class TablesController {
         });
         tablesTable.setItems(tables);
 
+        // check if timer under 15min or table already have order
+        tablesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                boolean hasOrder = newSelection.getOrder() != null;
+                boolean isTimerTooLow = CountdownTimerUtil.getRemainingTime() < 15 * 60;
+                assignOrderButton.setDisable(hasOrder || isTimerTooLow);
+            } else {
+                assignOrderButton.setDisable(true);
+            }
+        });
+
         tablesTable.setRowFactory(tv -> {
             TableRow<TablesEntity> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
                     TablesEntity selectedTable = row.getItem();
                     OrdersEntity order = selectedTable.getOrder();
-
                     if (order != null) {
                         OrderDetailsPopupUtil.show(order);
                     }
@@ -94,8 +100,6 @@ public class TablesController {
         markOccupiedButton.setOnAction(event -> markTableOccupied());
         assignOrderButton.setOnAction(event -> assignOrder());
         createTableButton.setOnAction(event -> createTable());
-
-
         homeButton.setOnAction(event -> MainController.getInstance().switchView("HomePage.fxml"));
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -143,7 +147,6 @@ public class TablesController {
         if (selectedTable != null) {
             selectedTable.setOccupied(true);
             tablesTable.refresh();
-
             isOccuped(selectedTable, true);
         }
     }
@@ -162,36 +165,29 @@ public class TablesController {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-
             TablesEntity table = new TablesEntity(newTable.getSize(), newTable.getLocation(), newTable.isOccupied());
             session.save(table);
-
             transaction.commit();
         } catch (Exception e) {
             e.printStackTrace();
         }
         tables.add(newTable);
-        tablesTable.refresh(); // Refresh TableView to show new tables
-
+        tablesTable.refresh();
         tableNumberField.clear();
     }
 
     private void createOrder(double totalPrice, TablesEntity table, List<DishesEntity> selectedDishes, double totalPriceProduction) {
-        OrdersEntity newOrder = new OrdersEntity(new Date(), 0, totalPrice,table , (int) totalPriceProduction);
-        Transaction tx = null;
 
+        OrdersEntity newOrder = new OrdersEntity(new Date(), 0, totalPrice,table , (int) totalPriceProduction);
+
+      Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-
-            // Step 1
             session.save(newOrder);
-
-            // Step 2
             table.setOrder(newOrder);
             table.setOccupied(true);
             session.update(table);
 
-            // Step 3
             for (DishesEntity dish : selectedDishes) {
                 OrderDishiesEntity orderDish = new OrderDishiesEntity();
                 orderDish.setDish(dish);
@@ -213,7 +209,6 @@ public class TablesController {
         List<DishesEntity> selectedDishes = new ArrayList<>();
 
         if (selectedTable != null) {
-//            selectedTable.setAssignedOrder("Commande #" + (int)(Math.random() * 100));
             tablesTable.refresh();
 
             try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -222,30 +217,25 @@ public class TablesController {
                 throw new RuntimeException(e);
             }
 
-
             Stage detailStage = new Stage();
             detailStage.setTitle("Détails de la commande");
 
             DoubleProperty totalPrice = new SimpleDoubleProperty(0);
             DoubleProperty totalPriceProduction = new SimpleDoubleProperty(0);
 
-            // --- Zone scrollable (cards) ---
             VBox scrollableDishLayout = new VBox(20);
             scrollableDishLayout.setStyle("-fx-padding: 10;");
             scrollableDishLayout.setFillWidth(true);
-
 
             dishes.stream().forEach(dish -> {
                 VBox dishCard = createDishCard(dish, totalPrice, selectedDishes, totalPriceProduction);
                 scrollableDishLayout.getChildren().add(dishCard);
             });
 
-            // ScrollPane
             ScrollPane scrollPane = new ScrollPane(scrollableDishLayout);
             scrollPane.setFitToWidth(true);
             scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-            // searchBar
             TextField searchField = new TextField();
             searchField.setPromptText("Rechercher un plat...");
             searchField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -259,15 +249,16 @@ public class TablesController {
                         });
             });
 
-            // --- total + boutons ---
             Text totalText = new Text();
             totalText.textProperty().bind(Bindings.concat("Total price: ", totalPrice.asString(), " €"));
             totalText.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
             Button createOrderButton = new Button("Create Order");
             createOrderButton.setStyle("-fx-font-size: 14px;");
+            createOrderButton.disableProperty().bind(CountdownTimerUtil.shouldDisableOrderButtonProperty());
+
             createOrderButton.setOnAction(e -> {
-                createOrder(totalPrice.get(), selectedTable, selectedDishes,totalPriceProduction.get());
+                createOrder(totalPrice.get(), selectedTable, selectedDishes, totalPriceProduction.get());
                 detailStage.close();
             });
 
@@ -282,19 +273,15 @@ public class TablesController {
             bottomBox.setStyle("-fx-padding: 10; -fx-background-color: #ffffff;");
             bottomBox.setAlignment(Pos.CENTER);
 
-            // --- Layout principal ---
             BorderPane mainLayout = new BorderPane();
             mainLayout.setTop(searchField);
             mainLayout.setCenter(scrollPane);
             mainLayout.setBottom(bottomBox);
 
-            // --- Scene ---
             Scene detailScene = new Scene(mainLayout, 400, 500);
             detailStage.setScene(detailScene);
             detailStage.show();
-
         }
-
     }
 
     private VBox createDishCard(DishesEntity dish, DoubleProperty totalPrice, List<DishesEntity> selectedDishes, DoubleProperty totalPriceProduction) {

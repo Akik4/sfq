@@ -37,7 +37,7 @@ public class OrdersEntity {
     }
 
     public OrdersEntity(Date date, int status, double price,TablesEntity table, double priceProduction) {
-        this.date = date;
+       this.date = date;
         this.status = status;
         this.price = price;
         this.table = table;

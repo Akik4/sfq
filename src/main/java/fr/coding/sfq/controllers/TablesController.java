@@ -47,9 +47,10 @@ public class TablesController {
     public void initialize() {
         tableNumberColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLocation()));
         statusColumn.setCellValueFactory(cellData -> {
+
             TablesEntity table = cellData.getValue();
             return new SimpleStringProperty(table.isOccupied() ? "Occupé" : "Disponible");
-        });
+       });
         assignedOrderColumn.setCellValueFactory(cellData -> {
             OrdersEntity order = cellData.getValue().getOrder();
             return new SimpleStringProperty(order != null ? "Commande #" + order.getId() : "Aucune");
@@ -259,7 +260,7 @@ public class TablesController {
 
             createOrderButton.setOnAction(e -> {
                 createOrder(totalPrice.get(), selectedTable, selectedDishes, totalPriceProduction.get());
-                detailStage.close();
+               detailStage.close();
             });
 
             Button closeButton = new Button("Fermer");

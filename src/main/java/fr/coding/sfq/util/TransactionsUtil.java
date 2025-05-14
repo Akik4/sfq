@@ -10,6 +10,7 @@ public class TransactionsUtil {
 
     public static void addIncome(double amount, String description) {
         TransactionEntity transaction = new TransactionEntity(LocalDateTime.now(), TransactionEntity.Type.INCOME, amount, description);
+
         saveTransaction(transaction);
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
@@ -17,7 +18,7 @@ public class TransactionsUtil {
     }
 
     private static void saveTransaction(TransactionEntity transaction) {
-        Transaction tx = null;
+       Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             session.save(transaction);

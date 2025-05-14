@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane fx:id="dashboard" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.coding.sfq.controllers.AllDashboardController">
+
+    <!-- TableView for Last Orders -->
+    <left>
+        <TableView fx:id="ordersTable">
+            <columns>
+                <TableColumn fx:id="OrderID" text="Order ID" />
+                <TableColumn fx:id="TableNo" text="Table No." />
+                <TableColumn fx:id="Status" text="Occupé" />
+            </columns>
+        </TableView>
+    </left>
+
+    <!-- GridPane for Table Occupancy -->
+    <center>
+        <GridPane fx:id="tableGrid" xmlns="http://javafx.com/javafx/17"
+                  xmlns:fx="http://javafx.com/fxml/1"
+                  hgap="20" vgap="20">
+            <VBox fx:id="mine">
+<!--                <HBox>-->
+<!--                    <Label>TABLE 1</Label>-->
+<!--                    <Circle radius="10" fill="green" />-->
+<!--                </HBox>-->
+<!--                <HBox>-->
+<!--                    <Label>TABLE 2</Label>-->
+<!--                    <Circle radius="10" fill="red" />-->
+<!--                </HBox>-->
+            </VBox>
+        </GridPane>
+    </center>
+
+</BorderPane>

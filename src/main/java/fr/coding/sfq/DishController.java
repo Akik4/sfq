@@ -1,6 +1,5 @@
 package fr.coding.sfq;
 
-import fr.coding.sfq.models.Dishes;
 import fr.coding.sfq.models.DishesEntity;
 import fr.coding.sfq.util.HibernateUtil;
 import javafx.application.Platform;
@@ -33,6 +32,7 @@ public class DishController {
     @FXML private TextField nameField;
     @FXML private TextField descriptionField;
     @FXML private TextField priceField;
+    @FXML private TextField urlImageField;
 
     private List<DishesEntity> dishes = FXCollections.observableArrayList();
 
@@ -70,6 +70,7 @@ public class DishController {
     private void addDish() {
         String name = nameField.getText();
         String description = descriptionField.getText();
+        String imageUrl = urlImageField.getText();
         int price;
 
         try {
@@ -79,19 +80,21 @@ public class DishController {
             return;
         }
 
+
         DishesEntity dish = new DishesEntity();
 
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
+            dish = new DishesEntity(name, description, price, imageUrl);
 
-            dish = new DishesEntity(name, description, price, "");
             session.save(dish);
-
             transaction.commit();
+            dishes.add(dish);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
 
         displayDish(dish);
 
@@ -101,6 +104,7 @@ public class DishController {
         nameField.clear();
         descriptionField.clear();
         priceField.clear();
+        urlImageField.clear();
     }
 
     private void displayDish(DishesEntity dish) {
@@ -117,9 +121,7 @@ public class DishController {
         Text dishPrice = new Text(dish.getPrice() + " €");
         dishPrice.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: green;");
 
-        ImageView dishImage = new ImageView(getClass().getResource("/images/placeholder.png").toExternalForm());
-        dishImage.setFitWidth(120);
-        dishImage.setFitHeight(120);
+        ImageView dishImage = createDishImage(imageUrl, 120, 120);
 
         dishCard.getChildren().addAll(dishImage, dishName, dishDescription, dishPrice);
 
@@ -152,14 +154,32 @@ public class DishController {
             Text dishPrice = new Text(dish.getPrice() + " €");
             dishPrice.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: green;");
 
+            ImageView dishImage = createDishImage(dish.getImageURL(), 150, 150);
+
             Button closeButton = new Button("Fermer");
             closeButton.setOnAction(event -> detailStage.close());
 
-            detailLayout.getChildren().addAll(dishName, dishDescription, dishPrice, closeButton);
+            detailLayout.getChildren().addAll(dishImage, dishName, dishDescription, dishPrice, closeButton);
 
-            Scene detailScene = new Scene(detailLayout, 300, 200);
+            Scene detailScene = new Scene(detailLayout, 300, 350);
             detailStage.setScene(detailScene);
             detailStage.show();
         });
     }
+    private ImageView createDishImage(String imageUrl, int width, int height) {
+        ImageView dishImage;
+        try {
+            if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                dishImage = new ImageView(new Image(imageUrl, true));
+            } else {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            dishImage = new ImageView(getClass().getResource("/images/placeholder.png").toExternalForm());
+        }
+        dishImage.setFitWidth(width);
+        dishImage.setFitHeight(height);
+        return dishImage;
+    }
+
 }

@@ -21,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.hibernate.Session;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,11 @@ public class AllDashboardController {
 
     @FXML private VBox mine;
 
+    @FXML private VBox inProgressOrdersList;
+    @FXML private VBox finishedOrdersList;
+    @FXML private Label inProgressTotalLabel;
+    @FXML private Label finishedTotalLabel;
+
     public void initialize() {
         Platform.runLater(() -> {
             try(Session session = HibernateUtil.getSessionFactory().openSession()){
@@ -45,6 +51,7 @@ public class AllDashboardController {
 
             loadOrders();
             loadTableStatuses();
+            loadRecentOrders();
         });
 
 
@@ -62,11 +69,60 @@ public class AllDashboardController {
 
     private void loadTableStatuses() {
         // Fetch table statuses and update tableStatusGrid
-        System.out.println(orders.size());
         orders.stream().map(TablesEntity::getLocation).forEach(fn -> {
             mine.getChildren().add(new Label(fn));
 //                tableGrid.add(new Text("test"), 1, 1);
             }
         );
+    }
+
+    private void loadRecentOrders() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            LocalDate now = LocalDate.now();
+
+            // recup commande dernieres 24h
+            List<OrdersEntity> inProgressOrders = session.createQuery("FROM OrdersEntity", OrdersEntity.class)
+                    .stream()
+                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && !o.getStatus())
+                    .collect(Collectors.toList());
+
+            List<OrdersEntity> finishedOrders = session.createQuery("FROM OrdersEntity", OrdersEntity.class)
+                    .stream()
+                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && o.getStatus())
+                    .collect(Collectors.toList());
+
+
+            inProgressOrdersList.getChildren().clear();
+            finishedOrdersList.getChildren().clear();
+
+            inProgressOrders.stream()
+                    .map(order -> new Label("Commande #" + order.getId() + " - " + order.getPrice() + " €"))
+                    .forEach(label -> inProgressOrdersList.getChildren().add(label));
+
+            double totalInProgress = inProgressOrders.stream()
+                    .mapToDouble(OrdersEntity::getPrice)
+                    .sum();
+
+            finishedOrders.stream()
+                    .map(order -> new Label("Commande #" + order.getId() + " - " + order.getPrice() + " €"))
+                    .forEach(label -> finishedOrdersList.getChildren().add(label));
+
+            double totalFinished = finishedOrders.stream()
+                    .mapToDouble(OrdersEntity::getPrice)
+                    .sum();
+
+            if (inProgressOrdersList.getChildren().isEmpty()){
+                inProgressTotalLabel.setText("Aucune commande en cours");
+            } else {
+                inProgressTotalLabel.setText("Total : " + totalInProgress + " €");
+            }
+
+            if (finishedOrdersList.getChildren().isEmpty()){
+                finishedTotalLabel.setText("Aucune commande en cours");
+            } else {
+                finishedTotalLabel.setText("Total : " + totalFinished + " €");
+            }
+
+        }
     }
 }

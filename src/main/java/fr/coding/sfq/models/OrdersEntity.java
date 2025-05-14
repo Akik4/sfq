@@ -2,7 +2,9 @@ package fr.coding.sfq.models;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -20,6 +22,9 @@ public class OrdersEntity {
 
     @Column
     private double price;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDishiesEntity> orderDishes = new ArrayList<>();
 
     public OrdersEntity() {
     }

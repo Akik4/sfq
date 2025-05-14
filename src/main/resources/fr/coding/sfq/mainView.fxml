@@ -10,8 +10,14 @@
             <Button text="Gérer les Tables" fx:id="tablesButton"/>
             <Button text="Gérer les Employés" fx:id="employeeButton"/>
             <Button text="voir les Transactions" fx:id="transactionsButton"/>
+            <StackPane BorderPane.alignment="TOP_CENTER" style="-fx-padding: 10; -fx-background-color: #f4f4f4;">
+                <fx:include source="Timer.fxml"/>
+             </StackPane>
+
         </HBox>
     </top>
+
+
 
     <center>
         <VBox fx:id="contentPane"/>  <!-- Wrap inside VBox -->

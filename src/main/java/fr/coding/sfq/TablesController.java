@@ -1,5 +1,10 @@
 package fr.coding.sfq;
 
+import fr.coding.sfq.models.Dishes;
+import fr.coding.sfq.models.DishesEntity;
+import fr.coding.sfq.models.Orders;
+import fr.coding.sfq.models.Tables;
+import fr.coding.sfq.util.HibernateUtil;
 import fr.coding.sfq.models.*;
 import fr.coding.sfq.util.HibernateUtil;
 import javafx.beans.binding.Bindings;
@@ -10,12 +15,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.Session;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,7 +49,7 @@ public class TablesController {
     @FXML private Button homeButton;
 
     private ObservableList<TablesEntity> tables = FXCollections.observableArrayList();
-    private ObservableList<DishesEntity> dishes = FXCollections.observableArrayList();
+    private List<DishesEntity> dishes = FXCollections.observableArrayList();
 
 
     @FXML
@@ -153,14 +161,11 @@ public class TablesController {
 //            selectedTable.setAssignedOrder("Commande #" + (int)(Math.random() * 100));
             tablesTable.refresh();
 
-            DishesEntity Dnew = new DishesEntity("name", "description", 0, "");
-            DishesEntity Dnew2 = new DishesEntity("name2", "description2", 2, "");
-            DishesEntity Dnew3 = new DishesEntity("name3", "description3", 3, "");
-
-
-            dishes.add(Dnew);
-            dishes.add(Dnew2);
-            dishes.add(Dnew3);
+            try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                dishes = session.createQuery("FROM DishesEntity", DishesEntity.class).list();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
 
             Stage detailStage = new Stage();

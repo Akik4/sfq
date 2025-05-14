@@ -1,8 +1,9 @@
 package fr.coding.sfq;
 
-import fr.coding.sfq.models.Employee;
+import fr.coding.sfq.models.DishesEntity;
+import fr.coding.sfq.models.EmployeeEntity;
+import fr.coding.sfq.util.HibernateUtil;
 import javafx.scene.control.*;
-import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.scene.layout.HBox;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -11,15 +12,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import java.util.List;
 
 public class EmployeeController {
 
-    @FXML private TableView<Employee> employeeTable;
-    @FXML private TableColumn<Employee, String> employeeNameColumn;
-    @FXML private TableColumn<Employee, String> employeePositionColumn;
-    @FXML private TableColumn<Employee, Number> employeeWorkHoursColumn;
-    @FXML private TableColumn<Employee, Number> employeeAgeColumn;
-    @FXML private TableColumn<Employee, Void> actionsColumn;
+    @FXML private TableView<EmployeeEntity> employeeTable;
+    @FXML private TableColumn<EmployeeEntity, String> employeeNameColumn;
+    @FXML private TableColumn<EmployeeEntity, String> employeePositionColumn;
+    @FXML private TableColumn<EmployeeEntity, Number> employeeWorkHoursColumn;
+    @FXML private TableColumn<EmployeeEntity, Number> employeeAgeColumn;
+    @FXML private TableColumn<EmployeeEntity, Void> actionsColumn;
 
     @FXML private TextField employeeNameField;
     @FXML private TextField employeePositionField;
@@ -28,17 +33,16 @@ public class EmployeeController {
 
     @FXML private Button homeButton;
 
-    private ObservableList<Employee> employees = FXCollections.observableArrayList();
+    private List<EmployeeEntity> employees = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
         employeeNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         employeePositionColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPosition()));
-        employeeWorkHoursColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getWorkHours()));
+        employeeWorkHoursColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getHoursWorked()));
         employeeAgeColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getAge()));
-        employeeTable.setItems(employees);
 
-        createEmployeeButton.setOnAction(event -> createTable());
+        createEmployeeButton.setOnAction(event -> createEmployee());
 
         homeButton.setOnAction(event -> MainController.getInstance().switchView("HomePage.fxml"));
 
@@ -46,36 +50,66 @@ public class EmployeeController {
 
         employeeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            employees = session.createQuery("From EmployeeEntity", EmployeeEntity.class).list();
+
+            employees.stream().forEach(employee -> employeeTable.getItems().add(employee));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 
-    private void createTable() {
+    private void createEmployee() {
         String employeeName;
-        String employeePostion;
+        String employeePosition;
         String employeeAge;
 
         try {
             employeeName = employeeNameField.getText();
-            employeePostion = employeePositionField.getText();
+            employeePosition = employeePositionField.getText();
             employeeAge = employeeAgeField.getText();
+
+            Transaction transaction = null;
+            try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                transaction = session.beginTransaction();
+
+                EmployeeEntity newEmployee = new EmployeeEntity(employeeName, 0, employeePosition, Integer.parseInt(employeeAge));
+
+                // add to db
+                session.save(newEmployee);
+                transaction.commit();
+
+                // temporary add to avoid calling db
+                try {
+                    employeeTable.getItems().add(newEmployee);
+                    employeeTable.refresh();
+                    System.out.println("ca passe askip");
+                } catch (Exception e) {
+                    System.out.println("erreur mpon copain");
+                }
+
+
+                // reset inputs
+                employeeNameField.clear();
+                employeePositionField.clear();
+                employeeAgeField.clear();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
         } catch (NumberFormatException e) {
             System.out.println("Informations invalides");
             return;
         }
 
-        Employee newEmployee = new Employee(employeeName, 0, employeePostion, Integer.parseInt(employeeAge));
-        employees.add(newEmployee);
-        employeeTable.refresh();
-
-        employeeNameField.clear();
-        employeePositionField.clear();
-        employeeAgeField.clear();
     }
 
     private void addActionsToTable() {
-        Callback<TableColumn<Employee, Void>, TableCell<Employee, Void>> cellFactory = new Callback<>() {
+        Callback<TableColumn<EmployeeEntity, Void>, TableCell<EmployeeEntity, Void>> cellFactory = new Callback<>() {
             @Override
-            public TableCell<Employee, Void> call(final TableColumn<Employee, Void> param) {
+            public TableCell<EmployeeEntity, Void> call(final TableColumn<EmployeeEntity, Void> param) {
                 return new TableCell<>() {
 
                     private final Button addHoursBtn = new Button("Ajouter Heures");
@@ -85,7 +119,7 @@ public class EmployeeController {
                     {
                         addHoursBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
                         addHoursBtn.setOnAction(event -> {
-                            Employee employee = getTableView().getItems().get(getIndex());
+                            EmployeeEntity employee = getTableView().getItems().get(getIndex());
 
                             TextInputDialog dialog = new TextInputDialog();
                             dialog.setTitle("Ajouter des heures");
@@ -93,9 +127,15 @@ public class EmployeeController {
                             dialog.setContentText("Heures à ajouter :");
 
                             dialog.showAndWait().ifPresent(input -> {
-                                try {
+                                try (Session session = HibernateUtil.getSessionFactory().openSession()){
+                                    Transaction transaction = session.beginTransaction();
+
                                     double additionalHours = Double.parseDouble(input);
-                                    employee.setWorkHours(employee.getWorkHours() + additionalHours);
+                                    employee.setHoursWorked(employee.getHoursWorked() + additionalHours);
+                                    session.update(employee);
+                                    transaction.commit();
+
+                                    //temporary update hours
                                     employeeTable.refresh();
                                 } catch (NumberFormatException e) {
                                     System.out.println("Entrée invalide : doit être un nombre.");
@@ -105,9 +145,21 @@ public class EmployeeController {
 
                         deleteBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
                         deleteBtn.setOnAction(event -> {
-                            Employee employee = getTableView().getItems().get(getIndex());
-                            employees.remove(employee);
-                            employeeTable.refresh();
+                            EmployeeEntity employee = getTableView().getItems().get(getIndex());
+
+                            try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                                Transaction transaction = session.beginTransaction();
+
+                                session.delete(employee);
+                                transaction.commit();
+
+                                // temporary remove
+                                employeeTable.getItems().remove(employee);
+                                employeeTable.refresh();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                return;
+                            }
                         });
                     }
 

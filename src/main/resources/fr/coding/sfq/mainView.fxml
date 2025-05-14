@@ -4,8 +4,20 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.MainController">
     <top>
-        <Label text="Restaurant Manager" style="-fx-font-size: 24px; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
+        <HBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml">
+            <Label text="Restaurant Manager" style="-fx-font-size: 24px; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
+            <Button text="Voir les plats" fx:id="goToDishesButton"/>
+            <Button text="Gérer les Tables" fx:id="tablesButton"/>
+            <Button text="Gérer les Employés" fx:id="employeeButton"/>
+            <Button text="voir les Transactions" fx:id="transactionsButton"/>
+            <StackPane BorderPane.alignment="TOP_CENTER" style="-fx-padding: 10; -fx-background-color: #f4f4f4;">
+                <fx:include source="Timer.fxml"/>
+             </StackPane>
+
+        </HBox>
     </top>
+
+
 
     <center>
         <VBox fx:id="contentPane"/>  <!-- Wrap inside VBox -->

@@ -7,7 +7,7 @@ import javafx.scene.control.Label;
 
 public class CountdownTimerUtil extends Thread {
 
-    private static int value = 15 * 61;
+    private static int value = 25 * 60;
     private final Label label;
 
     private static final BooleanProperty shouldDisableOrderButton = new SimpleBooleanProperty(false);

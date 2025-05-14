@@ -55,11 +55,6 @@ public class AllDashboardController {
     ObservableList<OrdersEntity> orders = FXCollections.observableArrayList();
 
 
-    @FXML private VBox inProgressOrdersList;
-    @FXML private VBox finishedOrdersList;
-    @FXML private Label inProgressTotalLabel;
-    @FXML private Label finishedTotalLabel;
-
     public void initialize() {
         Platform.runLater(() -> {
             try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -74,8 +69,6 @@ public class AllDashboardController {
             loadLastClient();
             loadRecentOrders();
             loadLastOrder();
-            loadTableStatuses();
-            loadRecentOrders();
         });
     }
 
@@ -124,7 +117,7 @@ public class AllDashboardController {
         VBox box = new VBox();
         Label titre = new Label("Commande à servir : ");
         box.getChildren().add(titre);
-        orders.stream().filter(fn -> fn.getStatus == 0).sorted(Comparator.comparingInt(OrdersEntity::getId).reversed()).limit(5).forEach(fn -> {
+        orders.stream().filter(fn -> fn.getStatus() == 0).sorted(Comparator.comparingInt(OrdersEntity::getId).reversed()).limit(5).forEach(fn -> {
 
             List<OrderDishiesEntity> orderDishies = FXCollections.observableArrayList();
 
@@ -155,12 +148,12 @@ public class AllDashboardController {
             // recup commande dernieres 24h
             List<OrdersEntity> inProgressOrders = session.createQuery("FROM OrdersEntity", OrdersEntity.class)
                     .stream()
-                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && !o.getStatus())
+                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && o.getStatus() == 0)
                     .collect(Collectors.toList());
 
             List<OrdersEntity> finishedOrders = session.createQuery("FROM OrdersEntity", OrdersEntity.class)
                     .stream()
-                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && o.getStatus())
+                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && o.getStatus() == 1)
                     .collect(Collectors.toList());
 
 
@@ -197,55 +190,4 @@ public class AllDashboardController {
 
         }
     }
-
-    private void loadRecentOrders() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            LocalDate now = LocalDate.now();
-
-            // recup commande dernieres 24h
-            List<OrdersEntity> inProgressOrders = session.createQuery("FROM OrdersEntity", OrdersEntity.class)
-                    .stream()
-                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && (o.getStatus() == 0))
-                    .collect(Collectors.toList());
-
-            List<OrdersEntity> finishedOrders = session.createQuery("FROM OrdersEntity", OrdersEntity.class)
-                    .stream()
-                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && (o.getStatus() == 1))
-                    .collect(Collectors.toList());
-
-
-            inProgressOrdersList.getChildren().clear();
-            finishedOrdersList.getChildren().clear();
-
-            inProgressOrders.stream()
-                    .map(order -> new Label("Commande #" + order.getId() + " - " + order.getPrice() + " €"))
-                    .forEach(label -> inProgressOrdersList.getChildren().add(label));
-
-            double totalInProgress = inProgressOrders.stream()
-                    .mapToDouble(OrdersEntity::getPrice)
-                    .sum();
-
-            finishedOrders.stream()
-                    .map(order -> new Label("Commande #" + order.getId() + " - " + order.getPrice() + " €"))
-                    .forEach(label -> finishedOrdersList.getChildren().add(label));
-
-            double totalFinished = finishedOrders.stream()
-                    .mapToDouble(OrdersEntity::getPrice)
-                    .sum();
-
-            if (inProgressOrdersList.getChildren().isEmpty()){
-                inProgressTotalLabel.setText("Aucune commande en cours");
-            } else {
-                inProgressTotalLabel.setText("Total : " + totalInProgress + " €");
-            }
-
-            if (finishedOrdersList.getChildren().isEmpty()){
-                finishedTotalLabel.setText("Aucune commande en cours");
-            } else {
-                finishedTotalLabel.setText("Total : " + totalFinished + " €");
-            }
-
-        }
-    }
 }
-

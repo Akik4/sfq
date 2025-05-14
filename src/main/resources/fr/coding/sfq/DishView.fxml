@@ -23,6 +23,7 @@
                 <TextField fx:id="nameField" promptText="Nom du plat"/>
                 <TextField fx:id="descriptionField" promptText="Description"/>
                 <TextField fx:id="priceField" promptText="Prix"/>
+                <TextField fx:id="urlImageField" promptText="URL Image"/>
                 <Button text="Ajouter" fx:id="submitDishButton"/>
             </HBox>
         </VBox>

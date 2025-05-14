@@ -1,6 +1,5 @@
 package fr.coding.sfq;
 
-import fr.coding.sfq.models.Dishes;
 import fr.coding.sfq.models.DishesEntity;
 import fr.coding.sfq.util.HibernateUtil;
 import javafx.collections.FXCollections;
@@ -29,6 +28,7 @@ public class DishController {
     @FXML private TextField nameField;
     @FXML private TextField descriptionField;
     @FXML private TextField priceField;
+    @FXML private TextField urlImageField;
 
     private List<DishesEntity> dishes = FXCollections.observableArrayList();
 
@@ -40,20 +40,18 @@ public class DishController {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             dishes = session.createQuery("FROM DishesEntity", DishesEntity.class).list();
 
-            dishes.stream().forEach((dish) -> {
-                displayDish(dish.getName(), dish.getDescription(), (int) dish.getPrice());
+            dishes.forEach(dish -> {
+                displayDish(dish.getName(), dish.getDescription(), (int) dish.getPrice(), dish.getImageURL());
             });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-
     }
-
 
     private void addDish() {
         String name = nameField.getText();
         String description = descriptionField.getText();
+        String imageUrl = urlImageField.getText();
         int price;
 
         try {
@@ -63,30 +61,27 @@ public class DishController {
             return;
         }
 
-        displayDish(name, description, price);
+        displayDish(name, description, price, imageUrl);
 
-        DishesEntity dish = new DishesEntity();
+        DishesEntity dish = new DishesEntity(name, description, price, imageUrl);
 
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-
-            dish = new DishesEntity(name, description, price, "");
             session.save(dish);
-
             transaction.commit();
+            dishes.add(dish);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        dishes.add(dish);
-
         nameField.clear();
         descriptionField.clear();
         priceField.clear();
+        urlImageField.clear();
     }
 
-    private void displayDish(String name, String description, int price) {
+    private void displayDish(String name, String description, int price, String imageUrl) {
         // Create dish card dynamically
         VBox dishCard = new VBox(10);
         dishCard.setStyle("-fx-padding: 10; -fx-border-color: black; -fx-background-color: #f8f8f8; -fx-border-radius: 5;");
@@ -100,7 +95,17 @@ public class DishController {
         Text dishPrice = new Text(price + " €");
         dishPrice.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: green;");
 
-        ImageView dishImage = new ImageView(getClass().getResource("/images/placeholder.png").toExternalForm());
+        ImageView dishImage;
+        try {
+            if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                dishImage = new ImageView(new Image(imageUrl));
+            } else {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            dishImage = new ImageView(getClass().getResource("/images/placeholder.png").toExternalForm());
+        }
+
         dishImage.setFitWidth(120);
         dishImage.setFitHeight(120);
 

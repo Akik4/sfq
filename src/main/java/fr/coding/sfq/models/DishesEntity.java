@@ -19,7 +19,7 @@ public class DishesEntity {
     @Column(name = "price")
     private double price;
 
-    @Column(name = "imageURL")
+    @Column(name = "imageURL", columnDefinition = "LONGTEXT")
     private String imageURL;
 
     public DishesEntity() {}
@@ -41,9 +41,7 @@ public class DishesEntity {
     public double getPrice() {
         return price;
     }
-    public String getImageURL() {
-        return imageURL;
-    }
+    public String getImageURL() {return imageURL;}
 
     public void setName(String name) {
         this.name = name;

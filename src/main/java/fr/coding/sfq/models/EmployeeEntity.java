@@ -65,7 +65,7 @@ public class EmployeeEntity {
         return hoursWorked;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 }

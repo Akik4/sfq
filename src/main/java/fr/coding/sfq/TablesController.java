@@ -177,63 +177,36 @@ public class TablesController {
 
             DoubleProperty totalPrice = new SimpleDoubleProperty(0);
 
+
             // --- Zone scrollable (cards) ---
             VBox scrollableDishLayout = new VBox(20);
             scrollableDishLayout.setStyle("-fx-padding: 10;");
             scrollableDishLayout.setFillWidth(true);
 
-            for (DishesEntity dish : dishes) {
-                VBox dishCard = new VBox(10);
-                dishCard.setStyle("-fx-padding: 15; -fx-border-color: black; -fx-background-color: white;");
 
-                Text dishName = new Text(dish.getName());
-                dishName.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
-                Text dishDescription = new Text(dish.getDescription());
-                dishDescription.setStyle("-fx-font-size: 14px;");
-
-                Text dishPrice = new Text(dish.getPrice() + " €");
-                dishPrice.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #28a745;");
-
-                HBox quantityBox = new HBox(10);
-                quantityBox.setAlignment(Pos.CENTER);
-
-                Button minusButton = new Button("−");
-                Button plusButton = new Button("+");
-                Text quantityText = new Text("0");
-
-                plusButton.setOnAction(e -> {
-                    int currentQty = Integer.parseInt(quantityText.getText());
-                    int newQty = currentQty + 1;
-                    quantityText.setText(String.valueOf(newQty));
-                    totalPrice.set(totalPrice.get() + dish.getPrice());
-
-                    selectedDishes.add(dish);
-                });
-
-                minusButton.setOnAction(e -> {
-                    int currentQty = Integer.parseInt(quantityText.getText());
-                    if (currentQty > 0) {
-                        int newQty = currentQty - 1;
-                        quantityText.setText(String.valueOf(newQty));
-                        totalPrice.set(totalPrice.get() - dish.getPrice());
-
-                        if (newQty == 0) {
-                            selectedDishes.remove(dish);
-                        }
-                    }
-                });
-
-                quantityBox.getChildren().addAll(minusButton, quantityText, plusButton);
-
-                dishCard.getChildren().addAll(dishName, dishDescription, dishPrice, quantityBox);
+            dishes.stream().forEach(dish -> {
+                VBox dishCard = createDishCard(dish, totalPrice, selectedDishes);
                 scrollableDishLayout.getChildren().add(dishCard);
-            }
+            });
 
             // ScrollPane
             ScrollPane scrollPane = new ScrollPane(scrollableDishLayout);
             scrollPane.setFitToWidth(true);
             scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
+            // searchBar
+            TextField searchField = new TextField();
+            searchField.setPromptText("Rechercher un plat...");
+            searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+                String lowerInput = newValue.toLowerCase().trim();
+                scrollableDishLayout.getChildren().clear();
+                dishes.stream()
+                        .filter(dish -> dish.getDescription().toLowerCase().contains(lowerInput) || dish.getName().toLowerCase().contains(lowerInput))
+                        .forEach(dish -> {
+                            VBox dishCard = createDishCard(dish, totalPrice, selectedDishes);
+                            scrollableDishLayout.getChildren().add(dishCard);
+                        });
+            });
 
             // --- total + boutons ---
             Text totalText = new Text();
@@ -260,6 +233,7 @@ public class TablesController {
 
             // --- Layout principal ---
             BorderPane mainLayout = new BorderPane();
+            mainLayout.setTop(searchField);
             mainLayout.setCenter(scrollPane);
             mainLayout.setBottom(bottomBox);
 
@@ -269,5 +243,50 @@ public class TablesController {
             detailStage.show();
 
         }
+
+    }
+
+    private VBox createDishCard(DishesEntity dish, DoubleProperty totalPrice, List<DishesEntity> selectedDishes) {
+        VBox dishCard = new VBox(10);
+        dishCard.setStyle("-fx-padding: 15; -fx-border-color: black; -fx-background-color: white;");
+
+        Text dishName = new Text(dish.getName());
+        dishName.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        Text dishDescription = new Text(dish.getDescription());
+        dishDescription.setStyle("-fx-font-size: 14px;");
+
+        Text dishPrice = new Text(dish.getPrice() + " €");
+        dishPrice.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #28a745;");
+
+        HBox quantityBox = new HBox(10);
+        quantityBox.setAlignment(Pos.CENTER);
+
+        Button minusButton = new Button("−");
+        Button plusButton = new Button("+");
+        Text quantityText = new Text("0");
+
+        plusButton.setOnAction(e -> {
+            int currentQty = Integer.parseInt(quantityText.getText());
+            int newQty = currentQty + 1;
+            quantityText.setText(String.valueOf(newQty));
+            totalPrice.set(totalPrice.get() + dish.getPrice());
+            selectedDishes.add(dish);
+        });
+
+        minusButton.setOnAction(e -> {
+            int currentQty = Integer.parseInt(quantityText.getText());
+            if (currentQty > 0) {
+                int newQty = currentQty - 1;
+                quantityText.setText(String.valueOf(newQty));
+                totalPrice.set(totalPrice.get() - dish.getPrice());
+                if (newQty == 0) selectedDishes.remove(dish);
+            }
+        });
+
+        quantityBox.getChildren().addAll(minusButton, quantityText, plusButton);
+        dishCard.getChildren().addAll(dishName, dishDescription, dishPrice, quantityBox);
+
+        return dishCard;
     }
 }

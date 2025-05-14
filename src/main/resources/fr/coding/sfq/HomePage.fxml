@@ -6,10 +6,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.text.Text?>
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.HomeController" spacing="20" alignment="CENTER">
     <Label text="Bienvenue au Restaurant" style="-fx-font-size: 20px;"/>
-    <Button text="Voir les plats" fx:id="goToDishesButton"/>
-    <Button text="Gérer les Tables" fx:id="tablesButton"/>
-    <Button text="Gérer les Employés" fx:id="employeeButton"/>
-    <Button text="voir les Transactions" fx:id="transactionsButton"/>
+    <Text>HomePage</Text>
 </VBox>

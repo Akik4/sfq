@@ -19,6 +19,9 @@ public class TablesEntity {
 
     @Column(unique = false, nullable = false)
     private boolean occupied;
+    @ManyToOne
+    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    private OrdersEntity order;
 
     public TablesEntity() {
     }
@@ -53,7 +56,14 @@ public class TablesEntity {
         return location;
     }
 
+    public OrdersEntity getOrder() {
+        return order;
+    }
+
     public boolean isOccupied() {
         return occupied;
+    }
+    public void setOrder(OrdersEntity order) {
+        this.order = order;
     }
 }

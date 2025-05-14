@@ -18,6 +18,7 @@ public class MainController {
     @FXML private Button tablesButton;
     @FXML private Button employeeButton;
     @FXML private Button transactionsButton;
+    @FXML private Button ordersButton;
 
     public MainController() {
         instance = this; // Store a reference to this controller
@@ -29,7 +30,7 @@ public class MainController {
         tablesButton.setOnAction(event -> MainController.getInstance().switchView("TableView.fxml"));
         employeeButton.setOnAction(event -> MainController.getInstance().switchView("EmployeeView.fxml"));
         transactionsButton.setOnAction(event -> MainController.getInstance().switchView("TransactionView.fxml"));
-
+        ordersButton.setOnAction(event -> MainController.getInstance().switchView("OrdersView.fxml"));
         switchView("HomePage.fxml"); // Loads homepage by default
     }
 

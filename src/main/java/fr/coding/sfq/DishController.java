@@ -41,7 +41,7 @@ public class DishController {
             dishes = session.createQuery("FROM DishesEntity", DishesEntity.class).list();
 
             dishes.stream().forEach((dish) -> {
-                displayDish(dish.getName(), dish.getDescription(), (int) dish.getPrice());
+                displayDish(dish);
             });
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -63,8 +63,6 @@ public class DishController {
             return;
         }
 
-        displayDish(name, description, price);
-
         DishesEntity dish = new DishesEntity();
 
         Transaction transaction = null;
@@ -79,6 +77,9 @@ public class DishController {
             e.printStackTrace();
         }
 
+        displayDish(dish);
+
+
         dishes.add(dish);
 
         nameField.clear();
@@ -86,18 +87,18 @@ public class DishController {
         priceField.clear();
     }
 
-    private void displayDish(String name, String description, int price) {
+    private void displayDish(DishesEntity dish) {
         // Create dish card dynamically
         VBox dishCard = new VBox(10);
         dishCard.setStyle("-fx-padding: 10; -fx-border-color: black; -fx-background-color: #f8f8f8; -fx-border-radius: 5;");
 
-        Text dishName = new Text(name);
+        Text dishName = new Text(dish.getName());
         dishName.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        Text dishDescription = new Text(description);
+        Text dishDescription = new Text(dish.getDescription());
         dishDescription.setStyle("-fx-font-size: 14px;");
 
-        Text dishPrice = new Text(price + " €");
+        Text dishPrice = new Text(dish.getPrice() + " €");
         dishPrice.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: green;");
 
         ImageView dishImage = new ImageView(getClass().getResource("/images/placeholder.png").toExternalForm());
@@ -108,16 +109,15 @@ public class DishController {
 
         // Make dish card clickable for details
         dishCard.setOnMouseClicked(event -> {
-            System.out.println("Event passed");
-            showDishDetails(name);
+            showDishDetails(dish.getId());
         });
 
         dishGrid.getChildren().add(dishCard); // Add new dish card to the FlowPane
     }
 
-    private void showDishDetails(String name) {
+    private void showDishDetails(int id) {
         List<DishesEntity> matchingDishes = dishes.stream()
-                .filter(dish -> dish.getName().equals(name))
+                .filter(dish -> dish.getId() == id)
                 .collect(Collectors.toList());
 
         matchingDishes.stream().findFirst().ifPresent(dish -> {

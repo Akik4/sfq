@@ -40,12 +40,20 @@ public class OrdersController {
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             return new SimpleStringProperty(formatter.format(cellData.getValue().getDate()));
         });
-        statusColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getStatus() ? "Terminée" : "En cours"));
+        statusColumn.setCellValueFactory(cellData -> {
+            int status = cellData.getValue().getStatus();
+            String statusText = switch (status) {
+                case 1 -> "Livré";
+                case 2 -> "Payé";
+                default -> "En cours";
+            };
+            return new SimpleStringProperty(statusText);
+        });
         priceColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()));
         tableColumn.setCellValueFactory(cellData -> {
             TablesEntity table = cellData.getValue().getTable();
-            return new SimpleStringProperty(table != null ? "Table n° " + table.getId() : "Aucune");
+
+            return new SimpleStringProperty(table != null ? "Table: " + table.getLocation() : "Aucune");
         });
         orderTable.setItems(orders);
 
@@ -67,15 +75,22 @@ public class OrdersController {
             @Override
             public TableCell<OrdersEntity, Void> call(final TableColumn<OrdersEntity, Void> param) {
                 return new TableCell<>() {
+                    private final Button payButton = new Button("Payer");
                     private final Button validateButton = new Button("Valider");
                     private final Button cancelButton = new Button("Annuler");
-                    private final Button payButton = new Button("Payer");
-                    private final HBox hBox = new HBox(5, validateButton, cancelButton, payButton);
+
+                    private final HBox hBox = new HBox(5,payButton, validateButton, cancelButton);
 
                     {
+                        payButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white;");
                         validateButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
                         cancelButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
                         payButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white;");
+
+                        payButton.setOnAction(event -> {
+                            OrdersEntity order = getTableView().getItems().get(getIndex());
+                            payOrder(order);
+                        });
 
                         validateButton.setOnAction(event -> {
                             OrdersEntity order = getTableView().getItems().get(getIndex());
@@ -96,9 +111,21 @@ public class OrdersController {
                     @Override
                     protected void updateItem(Void item, boolean empty) {
                         super.updateItem(item, empty);
+
                         if (empty) {
                             setGraphic(null);
                         } else {
+                            OrdersEntity order = getTableView().getItems().get(getIndex());
+
+                            HBox hBox = new HBox(5);
+
+                            if (order.getStatus() == 0) {
+                                hBox.getChildren().add(validateButton);
+                                hBox.getChildren().add(cancelButton);
+                            } else if (order.getStatus() == 1) {
+                                hBox.getChildren().add(payButton);
+                                hBox.getChildren().add(cancelButton);
+                            }
                             setGraphic(hBox);
                         }
                     }
@@ -113,7 +140,7 @@ public class OrdersController {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
 
-            order.setStatus(true);
+            order.setStatus(1);
             session.update(order);
             tx.commit();
             orderTable.refresh();
@@ -127,19 +154,7 @@ public class OrdersController {
     private void cancelOrder(OrdersEntity order) {
 
         // Step1
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Transaction tx = session.beginTransaction();
-
-            TablesEntity tableWithOrder = getTable(order, session);
-
-            tableWithOrder.setOrder(null);
-            tableWithOrder.setOccupied(false);
-            session.update(tableWithOrder);
-
-            tx.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Step1(order);
 
         // Step2
         try(Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -154,8 +169,35 @@ public class OrdersController {
         }
     }
 
+
+    private static void Step1(OrdersEntity order) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+
+            TablesEntity tableWithOrder = getTable(order, session);
+
+            tableWithOrder.setOrder(null);
+            tableWithOrder.setOccupied(false);
+            session.update(tableWithOrder);
+
+            tx.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void payOrder(OrdersEntity order) {
         TransactionsUtil.addIncome(order.getPrice(), "Paiement de la commande ID: " + order.getId());
+        Step1(order);
+        try(Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            order.setStatus(2);
+            session.update(order);
+            tx.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        initialize();
     }
 
     private static TablesEntity getTable(OrdersEntity order, Session session) {

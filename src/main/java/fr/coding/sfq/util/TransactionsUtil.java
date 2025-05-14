@@ -11,7 +11,14 @@ public class TransactionsUtil {
     public static void addIncome(double amount, String description) {
         TransactionEntity transaction = new TransactionEntity(LocalDateTime.now(), TransactionEntity.Type.INCOME, amount, description);
 
-        Transaction tx = null;
+        saveTransaction(transaction);
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+        }
+    }
+
+    private static void saveTransaction(TransactionEntity transaction) {
+       Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             session.save(transaction);
@@ -25,14 +32,6 @@ public class TransactionsUtil {
     public static void addExpense(double amount, String description) {
         TransactionEntity transaction = new TransactionEntity(LocalDateTime.now(), TransactionEntity.Type.EXPENSE, amount, description);
 
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-            session.save(transaction);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            e.printStackTrace();
-        }
+        saveTransaction(transaction);
     }
 }

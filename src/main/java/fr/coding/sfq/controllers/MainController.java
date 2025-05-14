@@ -39,7 +39,7 @@ public class MainController {
 
     public void switchView(String fxml) {
         try {
-            Parent view = FXMLLoader.load(getClass().getResource(fxml));
+            Parent view = FXMLLoader.load(getClass().getResource("/fr/coding/sfq/"+fxml));
             contentPane.getChildren().setAll(view); // Replace content properly
         } catch (IOException e) {
             e.printStackTrace();

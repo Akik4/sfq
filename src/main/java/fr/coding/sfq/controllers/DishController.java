@@ -1,22 +1,18 @@
-package fr.coding.sfq;
+package fr.coding.sfq.controllers;
 
 import fr.coding.sfq.models.DishesEntity;
 import fr.coding.sfq.util.HibernateUtil;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import org.hibernate.Session;
 import org.hibernate.Transaction;

@@ -1,4 +1,4 @@
-package fr.coding.sfq;
+package fr.coding.sfq.controllers;
 
 import fr.coding.sfq.models.DishesEntity;
 import fr.coding.sfq.util.HibernateUtil;

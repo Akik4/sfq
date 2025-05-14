@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.TransactionsController">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.controllers.TransactionsController">
 
     <top>
         <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10;">

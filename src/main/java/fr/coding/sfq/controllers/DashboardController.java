@@ -1,14 +1,10 @@
-package fr.coding.sfq;
+package fr.coding.sfq.controllers;
 
 import fr.coding.sfq.models.DishesEntity;
 import fr.coding.sfq.models.EmployeeEntity;
 import fr.coding.sfq.util.HibernateUtil;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
 import org.hibernate.Session;
 
 import java.util.Comparator;

@@ -1,7 +1,6 @@
-package fr.coding.sfq;
+package fr.coding.sfq.controllers;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 
 public class HomeController {
 

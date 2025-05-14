@@ -2,7 +2,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.TablesController">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.controllers.TablesController">
     <top>
         <HBox spacing="10">
             <Label text="Tables du Restaurant" style="-fx-font-size: 24px; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>

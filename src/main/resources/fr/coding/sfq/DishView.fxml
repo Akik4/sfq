@@ -12,9 +12,13 @@
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true">
-            <FlowPane fx:id="dishGrid" hgap="15" vgap="15"/>
-        </ScrollPane>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <TextField fx:id="searchField" promptText="Rechercher dans les descriptions..." />
+
+            <ScrollPane fitToWidth="true">
+                <FlowPane fx:id="dishGrid" hgap="15" vgap="15" />
+            </ScrollPane>
+        </VBox>
     </center>
 
     <bottom>

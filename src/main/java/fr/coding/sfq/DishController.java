@@ -34,12 +34,17 @@ public class DishController {
     @FXML private TextField priceField;
     @FXML private TextField urlImageField;
 
+    @FXML private TextField searchField;
+
     private List<DishesEntity> dishes = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
         submitDishButton.setOnAction(event -> addDish());
         homeButton.setOnAction(event -> MainController.getInstance().switchView("HomePage.fxml"));
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterDishesByDescription(newValue);
+        });
 
         loadingMessage();
         //RUNABLE
@@ -71,10 +76,10 @@ public class DishController {
         String name = nameField.getText();
         String description = descriptionField.getText();
         String imageUrl = urlImageField.getText();
-        int price;
+        double price;
 
         try {
-            price = Integer.parseInt(priceField.getText());
+            price = Double.parseDouble(priceField.getText());
         } catch (NumberFormatException e) {
             System.out.println("Prix invalide !");
             return;
@@ -94,13 +99,7 @@ public class DishController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
         displayDish(dish);
-
-
-        dishes.add(dish);
-
         nameField.clear();
         descriptionField.clear();
         priceField.clear();
@@ -180,6 +179,14 @@ public class DishController {
         dishImage.setFitWidth(width);
         dishImage.setFitHeight(height);
         return dishImage;
+    }
+
+    private void filterDishesByDescription(String input) {
+        String lowerInput = input.toLowerCase().trim();
+        dishGrid.getChildren().clear();
+        dishes.stream()
+                .filter(dish -> dish.getDescription().toLowerCase().contains(lowerInput) || dish.getName().toLowerCase().contains(lowerInput))
+                .forEach(this::displayDish);
     }
 
 }

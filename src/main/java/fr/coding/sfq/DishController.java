@@ -141,12 +141,26 @@ public class DishController {
             Text dishPrice = new Text(dish.getPrice() + " €");
             dishPrice.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: green;");
 
+            ImageView dishImage;
+            try {
+                if (dish.getImageURL() != null && !dish.getImageURL().trim().isEmpty()) {
+                    dishImage = new ImageView(new Image(dish.getImageURL(), true));
+                } else {
+                    throw new Exception();
+                }
+            } catch (Exception e) {
+                dishImage = new ImageView(getClass().getResource("/images/placeholder.png").toExternalForm());
+            }
+
+            dishImage.setFitWidth(150);
+            dishImage.setFitHeight(150);
+
             Button closeButton = new Button("Fermer");
             closeButton.setOnAction(event -> detailStage.close());
 
-            detailLayout.getChildren().addAll(dishName, dishDescription, dishPrice, closeButton);
+            detailLayout.getChildren().addAll(dishImage, dishName, dishDescription, dishPrice, closeButton);
 
-            Scene detailScene = new Scene(detailLayout, 300, 200);
+            Scene detailScene = new Scene(detailLayout, 300, 350);
             detailStage.setScene(detailScene);
             detailStage.show();
         });

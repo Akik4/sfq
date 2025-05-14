@@ -1,12 +1,8 @@
 package fr.coding.sfq;
 
-import fr.coding.sfq.models.Dishes;
 import fr.coding.sfq.models.DishesEntity;
-import fr.coding.sfq.models.Orders;
-import fr.coding.sfq.models.Tables;
 import fr.coding.sfq.util.HibernateUtil;
 import fr.coding.sfq.models.*;
-import fr.coding.sfq.util.HibernateUtil;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.fxml.FXML;
@@ -15,8 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -24,13 +18,10 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.Session;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class TablesController {
 

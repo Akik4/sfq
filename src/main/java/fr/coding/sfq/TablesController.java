@@ -95,11 +95,25 @@ public class TablesController {
         }
     }
 
+    private static void isOccuped(TablesEntity selectedTable, boolean bOccupied) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            selectedTable.setOccupied(bOccupied);
+            session.update(selectedTable);
+            tx.commit();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     private void markTableAvailable() {
         TablesEntity selectedTable = tablesTable.getSelectionModel().getSelectedItem();
         if (selectedTable != null) {
             selectedTable.setOccupied(false);
             tablesTable.refresh();
+
+            isOccuped(selectedTable, false);
         }
     }
 
@@ -108,6 +122,8 @@ public class TablesController {
         if (selectedTable != null) {
             selectedTable.setOccupied(true);
             tablesTable.refresh();
+
+            isOccuped(selectedTable, true);
         }
     }
 

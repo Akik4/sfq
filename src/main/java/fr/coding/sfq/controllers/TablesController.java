@@ -29,8 +29,9 @@ public class TablesController {
 
     @FXML private TableView<TablesEntity> tablesTable;
     @FXML private TableColumn<TablesEntity, String> tableNumberColumn;
-    @FXML private TableColumn<TablesEntity, Boolean> statusColumn;
+    @FXML private TableColumn<TablesEntity, String> statusColumn;
     @FXML private TableColumn<TablesEntity, String> assignedOrderColumn;
+    @FXML private TableColumn<TablesEntity, String> statusOrderColumn;
 
     @FXML private Button markAvailableButton;
     @FXML private Button markOccupiedButton;
@@ -49,10 +50,17 @@ public class TablesController {
     @FXML
     public void initialize() {
         tableNumberColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLocation()));
-        statusColumn.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue().isOccupied()));
+        statusColumn.setCellValueFactory(cellData -> {
+                TablesEntity table = cellData.getValue();
+                return new SimpleStringProperty(table.isOccupied() ? "Occupé" : "Disponible");
+        });
         assignedOrderColumn.setCellValueFactory(cellData -> {
             OrdersEntity order = cellData.getValue().getOrder();
             return new SimpleStringProperty(order != null ? "Commande #" + order.getId() : "Aucune");
+        });
+        statusOrderColumn.setCellValueFactory(cellData -> {
+            OrdersEntity order = cellData.getValue().getOrder();
+            return new SimpleStringProperty(order != null ? (order.getStatus() ? "Livré" : "En cours") : "...");
         });
         tablesTable.setItems(tables);
 

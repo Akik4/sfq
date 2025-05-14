@@ -16,6 +16,7 @@
                 <TableColumn text="Numéro" fx:id="tableNumberColumn"/>
                 <TableColumn text="Statut" fx:id="statusColumn"/>
                 <TableColumn text="Commande Assignée" fx:id="assignedOrderColumn"/>
+                <TableColumn text="Commande Statut" fx:id="statusOrderColumn"/>
             </columns>
         </TableView>
     </center>

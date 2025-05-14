@@ -103,17 +103,17 @@ public class OrdersController {
 
     private void validateOrder(OrdersEntity order) {
         // Step1
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Transaction tx = session.beginTransaction();
-
-            TablesEntity tableWithOrder = getTable(order, session);
-            tableWithOrder.setOrder(null);
-            session.save(tableWithOrder);
-
-            tx.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+//            Transaction tx = session.beginTransaction();
+//
+//            TablesEntity tableWithOrder = getTable(order, session);
+//            tableWithOrder.setOrder(null);
+//            session.save(tableWithOrder);
+//
+//            tx.commit();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         // Step2
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();

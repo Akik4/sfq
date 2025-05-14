@@ -17,6 +17,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -126,6 +127,8 @@ public class TablesController {
         OrdersEntity newOrder = new OrdersEntity(new Date(), false, totalPrice);
         Transaction tx = null;
 
+        System.out.println(selectedDishes.size());
+
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
 
@@ -147,6 +150,7 @@ public class TablesController {
 
             tx.commit();
             System.out.println("Commande créée avec ID = " + newOrder.getId());
+            initialize();
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             e.printStackTrace();
@@ -171,10 +175,12 @@ public class TablesController {
             Stage detailStage = new Stage();
             detailStage.setTitle("Détails de la commande");
 
-            VBox mainLayout = new VBox(20);
-            mainLayout.setStyle("-fx-padding: 20; -fx-background-color: #ffffff;");
-
             DoubleProperty totalPrice = new SimpleDoubleProperty(0);
+
+            // --- Zone scrollable (cards) ---
+            VBox scrollableDishLayout = new VBox(20);
+            scrollableDishLayout.setStyle("-fx-padding: 10;");
+            scrollableDishLayout.setFillWidth(true);
 
             for (DishesEntity dish : dishes) {
                 VBox dishCard = new VBox(10);
@@ -189,7 +195,6 @@ public class TablesController {
                 Text dishPrice = new Text(dish.getPrice() + " €");
                 dishPrice.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #28a745;");
 
-                // Quantité + boutons
                 HBox quantityBox = new HBox(10);
                 quantityBox.setAlignment(Pos.CENTER);
 
@@ -203,9 +208,7 @@ public class TablesController {
                     quantityText.setText(String.valueOf(newQty));
                     totalPrice.set(totalPrice.get() + dish.getPrice());
 
-                    if (!selectedDishes.contains(dish)) {
-                        selectedDishes.add(dish);
-                    }
+                    selectedDishes.add(dish);
                 });
 
                 minusButton.setOnAction(e -> {
@@ -224,28 +227,47 @@ public class TablesController {
                 quantityBox.getChildren().addAll(minusButton, quantityText, plusButton);
 
                 dishCard.getChildren().addAll(dishName, dishDescription, dishPrice, quantityBox);
-                mainLayout.getChildren().add(dishCard);
+                scrollableDishLayout.getChildren().add(dishCard);
             }
+
+            // ScrollPane
+            ScrollPane scrollPane = new ScrollPane(scrollableDishLayout);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
+            // --- total + boutons ---
+            Text totalText = new Text();
+            totalText.textProperty().bind(Bindings.concat("Total price: ", totalPrice.asString(), " €"));
+            totalText.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
             Button createOrderButton = new Button("Create Order");
             createOrderButton.setStyle("-fx-font-size: 14px;");
-            createOrderButton.setOnAction(e -> createOrder(totalPrice.get(), selectedTable, selectedDishes));
+            createOrderButton.setOnAction(e -> {
+                createOrder(totalPrice.get(), selectedTable, selectedDishes);
+                detailStage.close();
+            });
 
             Button closeButton = new Button("Fermer");
             closeButton.setStyle("-fx-font-size: 14px;");
             closeButton.setOnAction(event -> detailStage.close());
 
+            HBox buttonBox = new HBox(10, createOrderButton, closeButton);
+            buttonBox.setAlignment(Pos.CENTER);
 
-            Text totalText = new Text();
-            totalText.textProperty().bind(Bindings.concat("Total price: ", totalPrice.asString(), " €"));
-            totalText.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+            VBox bottomBox = new VBox(10, totalText, buttonBox);
+            bottomBox.setStyle("-fx-padding: 10; -fx-background-color: #ffffff;");
+            bottomBox.setAlignment(Pos.CENTER);
 
-            mainLayout.getChildren().addAll(closeButton, createOrderButton, totalText);
+            // --- Layout principal ---
+            BorderPane mainLayout = new BorderPane();
+            mainLayout.setCenter(scrollPane);
+            mainLayout.setBottom(bottomBox);
 
+            // --- Scene ---
             Scene detailScene = new Scene(mainLayout, 400, 500);
             detailStage.setScene(detailScene);
             detailStage.show();
+
         }
     }
-
 }

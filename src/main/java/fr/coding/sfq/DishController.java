@@ -3,17 +3,21 @@ package fr.coding.sfq;
 import fr.coding.sfq.models.Dishes;
 import fr.coding.sfq.models.DishesEntity;
 import fr.coding.sfq.util.HibernateUtil;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -37,19 +41,31 @@ public class DishController {
         submitDishButton.setOnAction(event -> addDish());
         homeButton.setOnAction(event -> MainController.getInstance().switchView("HomePage.fxml"));
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            dishes = session.createQuery("FROM DishesEntity", DishesEntity.class).list();
+        loadingMessage();
+        //RUNABLE
+        //async loading of data from db
+        Platform.runLater(() -> {
+            try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                dishes = session.createQuery("FROM DishesEntity", DishesEntity.class).list();
 
-            dishes.stream().forEach((dish) -> {
-                displayDish(dish);
-            });
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-
+                dishGrid.getChildren().clear();
+                dishes.stream().forEach((dish) -> {
+                    displayDish(dish);
+                });
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
+    private void loadingMessage() {
+        VBox dishCard = new VBox(10);
+
+        Text test = new Text("Chargement...");
+
+        dishCard.getChildren().addAll(test);
+        dishGrid.getChildren().add(dishCard);
+    }
 
     private void addDish() {
         String name = nameField.getText();

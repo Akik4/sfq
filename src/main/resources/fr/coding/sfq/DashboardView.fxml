@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="fr.coding.sfq.DashboardController"
+      spacing="10" alignment="CENTER_LEFT">
+
+    <Label text="Stats Employés" style="-fx-font-weight: bold;"/>
+
+    <Label fx:id="under30Label"/>
+    <Label fx:id="between30And45Label"/>
+    <Label fx:id="over45Label"/>
+
+    <Label text="Stats Plats" style="-fx-font-weight: bold;"/>
+
+    <Label fx:id="mostExpensiveDishLabel"/>
+    <Label fx:id="cheapestDishLabel"/>
+    <Label fx:id="totalMenuValueLabel"/>
+</VBox>

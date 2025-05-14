@@ -1,6 +1,7 @@
 package fr.coding.sfq.controllers;
 
 import fr.coding.sfq.models.DishesEntity;
+import fr.coding.sfq.util.CountdownTimerUtil;
 import fr.coding.sfq.util.HibernateUtil;
 import fr.coding.sfq.models.*;
 import fr.coding.sfq.util.HibernateUtil;
@@ -82,6 +83,7 @@ public class TablesController {
         markAvailableButton.setOnAction(event -> markTableAvailable());
         markOccupiedButton.setOnAction(event -> markTableOccupied());
         assignOrderButton.setOnAction(event -> assignOrder());
+        assignOrderButton.disableProperty().bind(CountdownTimerUtil.shouldDisableOrderButtonProperty());
         createTableButton.setOnAction(event -> createTable());
 
 
@@ -255,6 +257,7 @@ public class TablesController {
 
             Button createOrderButton = new Button("Create Order");
             createOrderButton.setStyle("-fx-font-size: 14px;");
+            createOrderButton.disableProperty().bind(CountdownTimerUtil.shouldDisableOrderButtonProperty());
             createOrderButton.setOnAction(e -> {
                 createOrder(totalPrice.get(), selectedTable, selectedDishes,totalPriceProduction.get());
                 detailStage.close();

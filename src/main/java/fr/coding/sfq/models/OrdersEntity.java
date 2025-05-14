@@ -2,6 +2,7 @@ package fr.coding.sfq.models;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -11,24 +12,21 @@ public class OrdersEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     @Column
-    private String dishId;
 
-    @Column
     private Date date;
+    @Column
+    private boolean status;
+    @Column
+    private double price;
 
     public OrdersEntity() {
     }
-    public OrdersEntity(String dishId, Date date) {
-        this.dishId = dishId;
+    public OrdersEntity(Date date, boolean status, double price) {
         this.date = date;
+        this.status = status;
+        this.price = price;
     }
-
-    public void setDishId(String dishId) {
-        this.dishId = dishId;
-    }
-
     public void setDate(Date date) {
         this.date = date;
     }
@@ -36,11 +34,6 @@ public class OrdersEntity {
     public int getId() {
         return id;
     }
-
-    public String getDishId() {
-        return dishId;
-    }
-
     public Date getDate() {
         return date;
     }

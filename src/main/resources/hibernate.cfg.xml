@@ -15,6 +15,6 @@
         <mapping class="fr.coding.sfq.models.DishesEntity"/>
         <mapping class="fr.coding.sfq.models.TablesEntity"/>
         <mapping class="fr.coding.sfq.models.OrdersEntity"/>
-        <mapping class="fr.coding.sfq.models.EmployeeEntity"/>
+        <mapping class="fr.coding.sfq.models.OrderDishiesEntity"/>
     </session-factory>
 </hibernate-configuration>

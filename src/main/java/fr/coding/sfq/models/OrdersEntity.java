@@ -23,16 +23,25 @@ public class OrdersEntity {
     @Column
     private double price;
 
+    @Column
+    private Double priceProduction;
+
+    @ManyToOne
+    @JoinColumn(name = "table_id", referencedColumnName = "id")
+    private TablesEntity table;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderDishiesEntity> orderDishes = new ArrayList<>();
 
     public OrdersEntity() {
     }
 
-    public OrdersEntity(Date date, boolean status, double price) {
+    public OrdersEntity(Date date, boolean status, double price,TablesEntity table, double priceProduction) {
         this.date = date;
         this.status = status;
         this.price = price;
+        this.table = table;
+        this.priceProduction = priceProduction;
     }
 
     public int getId() {
@@ -53,5 +62,17 @@ public class OrdersEntity {
 
     public double getPrice() {
         return price;
+    }
+
+    public void setTable(double price) {
+        this.table = table;
+    }
+
+    public TablesEntity getTable() {
+        return table;
+    }
+
+    public double getPriceProduction() {
+        return priceProduction;
     }
 }

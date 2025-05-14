@@ -121,7 +121,7 @@ public class DishController {
         Text dishPrice = new Text(dish.getPrice() + " €");
         dishPrice.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: green;");
 
-        ImageView dishImage = createDishImage(imageUrl, 120, 120);
+        ImageView dishImage = createDishImage(dish.getImageURL(), 120, 120);
 
         dishCard.getChildren().addAll(dishImage, dishName, dishDescription, dishPrice);
 

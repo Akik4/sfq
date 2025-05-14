@@ -1,6 +1,7 @@
 package fr.coding.sfq.controllers;
 
 import fr.coding.sfq.models.OrdersEntity;
+import fr.coding.sfq.models.TablesEntity;
 import fr.coding.sfq.util.HibernateUtil;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,6 +24,7 @@ public class OrdersController {
     @FXML private TableColumn<OrdersEntity, String> statusColumn;
     @FXML private TableColumn<OrdersEntity, Number> priceColumn;
     @FXML private TableColumn<OrdersEntity, Number> idColumn;
+    @FXML private TableColumn<OrdersEntity, String> tableColumn;
     @FXML private TableColumn<OrdersEntity, Void> actionsColumn;
     @FXML private Button homeButton;
 
@@ -40,7 +42,10 @@ public class OrdersController {
         statusColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getStatus() ? "Terminée" : "En cours"));
         priceColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()));
-
+        tableColumn.setCellValueFactory(cellData -> {
+            TablesEntity table = cellData.getValue().getTable();
+            return new SimpleStringProperty(table != null ? "Table n° " + table.getId() : "Aucune");
+        });
         orderTable.setItems(orders);
 
         addActionsToTable();
@@ -97,25 +102,68 @@ public class OrdersController {
     }
 
     private void validateOrder(OrdersEntity order) {
+        // Step1
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
+
+            TablesEntity tableWithOrder = getTable(order, session);
+            tableWithOrder.setOrder(null);
+            session.save(tableWithOrder);
+
+            tx.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Step2
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+
             order.setStatus(true);
             session.update(order);
             tx.commit();
             orderTable.refresh();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void cancelOrder(OrdersEntity order) {
+
+        // Step1
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
+
+            TablesEntity tableWithOrder = getTable(order, session);
+
+            tableWithOrder.setOrder(null);
+            tableWithOrder.setOccupied(false);
+            session.update(tableWithOrder);
+
+            tx.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Step2
+        try(Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+
             session.delete(order);
             tx.commit();
             orders.remove(order);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    private static TablesEntity getTable(OrdersEntity order, Session session) {
+        TablesEntity tablesWithOrder = session.createQuery(
+                        "FROM TablesEntity WHERE order = :order", TablesEntity.class)
+                .setParameter("order", order)
+                .getSingleResult();
+        return tablesWithOrder;
+    }
+
 }

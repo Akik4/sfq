@@ -106,6 +106,16 @@ public class TablesController {
             tablesTable.refresh();
 
             isOccuped(selectedTable, false);
+            if (selectedTable.getOrder() != null) {
+                try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                    Transaction tx = session.beginTransaction();
+                    selectedTable.setOrder(null);
+                    session.update(selectedTable);
+                    tx.commit();
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
         }
     }
 
@@ -148,7 +158,7 @@ public class TablesController {
     }
 
     private void createOrder(double totalPrice, TablesEntity table, List<DishesEntity> selectedDishes) {
-        OrdersEntity newOrder = new OrdersEntity(new Date(), false, totalPrice);
+        OrdersEntity newOrder = new OrdersEntity(new Date(), false, totalPrice, table);
         Transaction tx = null;
 
         System.out.println(selectedDishes.size());

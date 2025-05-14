@@ -57,20 +57,6 @@ public class TransactionsController {
         // Fonction qui Select toute la BDD et qui Add a la liste qui affiche les transactions
         loadTransactionsFromDatabase();
 
-        //Brut pour essayer l'insert BDD
-        addIncome(120.0, "Paiement table 1");
-        addExpense(45.0, "Salaire employé");
-        addIncome(90.0, "Paiement table 2");
-    }
-
-    private void addIncome(double amount, String description) {
-        TransactionEntity transaction = new TransactionEntity(LocalDateTime.now(), TransactionEntity.Type.INCOME, amount, description);
-        saveTransaction(transaction);
-    }
-
-    private void addExpense(double amount, String description) {
-        TransactionEntity transaction = new TransactionEntity(LocalDateTime.now(), TransactionEntity.Type.EXPENSE, amount, description);
-        saveTransaction(transaction);
     }
 
     // Fonction qui attend une autre fonction pour add Expense or Income dans la BDD

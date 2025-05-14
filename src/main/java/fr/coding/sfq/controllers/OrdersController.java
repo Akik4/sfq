@@ -1,4 +1,5 @@
 package fr.coding.sfq.controllers;
+import fr.coding.sfq.util.TransactionsUtil;
 
 import fr.coding.sfq.models.OrdersEntity;
 import fr.coding.sfq.util.HibernateUtil;
@@ -106,6 +107,8 @@ public class OrdersController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        TransactionsUtil.addExpense(order.getPriceProduction(), "Prix Production des plats de la commande ID: " + order.getId());
+
     }
 
     private void cancelOrder(OrdersEntity order) {

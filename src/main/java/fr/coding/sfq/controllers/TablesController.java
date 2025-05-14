@@ -147,11 +147,10 @@ public class TablesController {
         tableNumberField.clear();
     }
 
-    private void createOrder(double totalPrice, TablesEntity table, List<DishesEntity> selectedDishes) {
-        OrdersEntity newOrder = new OrdersEntity(new Date(), false, totalPrice);
+    private void createOrder(double totalPrice, TablesEntity table, List<DishesEntity> selectedDishes, double totalPriceProduction) {
+        OrdersEntity newOrder = new OrdersEntity(new Date(), false, totalPrice, (int) totalPriceProduction);
         Transaction tx = null;
-
-        System.out.println(selectedDishes.size());
+        System.out.println(newOrder.getPriceProduction());
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
@@ -200,6 +199,7 @@ public class TablesController {
             detailStage.setTitle("Détails de la commande");
 
             DoubleProperty totalPrice = new SimpleDoubleProperty(0);
+            DoubleProperty totalPriceProduction = new SimpleDoubleProperty(0);
 
             // --- Zone scrollable (cards) ---
             VBox scrollableDishLayout = new VBox(20);
@@ -208,7 +208,7 @@ public class TablesController {
 
 
             dishes.stream().forEach(dish -> {
-                VBox dishCard = createDishCard(dish, totalPrice, selectedDishes);
+                VBox dishCard = createDishCard(dish, totalPrice, selectedDishes, totalPriceProduction);
                 scrollableDishLayout.getChildren().add(dishCard);
             });
 
@@ -226,7 +226,7 @@ public class TablesController {
                 dishes.stream()
                         .filter(dish -> dish.getDescription().toLowerCase().contains(lowerInput) || dish.getName().toLowerCase().contains(lowerInput))
                         .forEach(dish -> {
-                            VBox dishCard = createDishCard(dish, totalPrice, selectedDishes);
+                            VBox dishCard = createDishCard(dish, totalPrice, selectedDishes, totalPriceProduction);
                             scrollableDishLayout.getChildren().add(dishCard);
                         });
             });
@@ -239,7 +239,7 @@ public class TablesController {
             Button createOrderButton = new Button("Create Order");
             createOrderButton.setStyle("-fx-font-size: 14px;");
             createOrderButton.setOnAction(e -> {
-                createOrder(totalPrice.get(), selectedTable, selectedDishes);
+                createOrder(totalPrice.get(), selectedTable, selectedDishes,totalPriceProduction.get());
                 detailStage.close();
             });
 
@@ -269,7 +269,7 @@ public class TablesController {
 
     }
 
-    private VBox createDishCard(DishesEntity dish, DoubleProperty totalPrice, List<DishesEntity> selectedDishes) {
+    private VBox createDishCard(DishesEntity dish, DoubleProperty totalPrice, List<DishesEntity> selectedDishes, DoubleProperty totalPriceProduction) {
         VBox dishCard = new VBox(10);
         dishCard.setStyle("-fx-padding: 15; -fx-border-color: black; -fx-background-color: white;");
 
@@ -294,6 +294,7 @@ public class TablesController {
             int newQty = currentQty + 1;
             quantityText.setText(String.valueOf(newQty));
             totalPrice.set(totalPrice.get() + dish.getPrice());
+            totalPriceProduction.set(totalPriceProduction.get() + dish.getPriceProduction());
             selectedDishes.add(dish);
         });
 
@@ -303,6 +304,7 @@ public class TablesController {
                 int newQty = currentQty - 1;
                 quantityText.setText(String.valueOf(newQty));
                 totalPrice.set(totalPrice.get() - dish.getPrice());
+                totalPriceProduction.set(totalPriceProduction.get() - dish.getPriceProduction());
                 if (newQty == 0) selectedDishes.remove(dish);
             }
         });

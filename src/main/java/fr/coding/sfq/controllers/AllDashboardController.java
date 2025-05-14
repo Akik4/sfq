@@ -83,12 +83,12 @@ public class AllDashboardController {
             // recup commande dernieres 24h
             List<OrdersEntity> inProgressOrders = session.createQuery("FROM OrdersEntity", OrdersEntity.class)
                     .stream()
-                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && !o.getStatus())
+                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && (o.getStatus() == 0))
                     .collect(Collectors.toList());
 
             List<OrdersEntity> finishedOrders = session.createQuery("FROM OrdersEntity", OrdersEntity.class)
                     .stream()
-                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && o.getStatus())
+                    .filter(o -> o.getDate().toInstant().isAfter(java.sql.Timestamp.valueOf(now.minusDays(1).atStartOfDay()).toInstant()) && (o.getStatus() == 1))
                     .collect(Collectors.toList());
 
 

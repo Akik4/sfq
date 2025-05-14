@@ -18,7 +18,7 @@ public class OrdersEntity {
     private Date date;
 
     @Column
-    private boolean status;
+    private int status;
 
     @Column
     private double price;
@@ -36,7 +36,7 @@ public class OrdersEntity {
     public OrdersEntity() {
     }
 
-    public OrdersEntity(Date date, boolean status, double price,TablesEntity table, double priceProduction) {
+    public OrdersEntity(Date date, int status, double price,TablesEntity table, double priceProduction) {
         this.date = date;
         this.status = status;
         this.price = price;
@@ -52,11 +52,11 @@ public class OrdersEntity {
         return date;
     }
 
-    public boolean getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

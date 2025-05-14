@@ -64,11 +64,13 @@ public class OrdersController {
                 return new TableCell<>() {
                     private final Button validateButton = new Button("Valider");
                     private final Button cancelButton = new Button("Annuler");
-                    private final HBox hBox = new HBox(5, validateButton, cancelButton);
+                    private final Button payButton = new Button("Payer");
+                    private final HBox hBox = new HBox(5, validateButton, cancelButton, payButton);
 
                     {
                         validateButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
                         cancelButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
+                        payButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white;");
 
                         validateButton.setOnAction(event -> {
                             OrdersEntity order = getTableView().getItems().get(getIndex());
@@ -78,6 +80,11 @@ public class OrdersController {
                         cancelButton.setOnAction(event -> {
                             OrdersEntity order = getTableView().getItems().get(getIndex());
                             cancelOrder(order);
+                        });
+
+                        payButton.setOnAction(event -> {
+                            OrdersEntity order = getTableView().getItems().get(getIndex());
+                            payOrder(order);
                         });
                     }
 
@@ -108,7 +115,6 @@ public class OrdersController {
             e.printStackTrace();
         }
         TransactionsUtil.addExpense(order.getPriceProduction(), "Prix Production des plats de la commande ID: " + order.getId());
-
     }
 
     private void cancelOrder(OrdersEntity order) {
@@ -120,5 +126,9 @@ public class OrdersController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void payOrder(OrdersEntity order) {
+        TransactionsUtil.addIncome(order.getPrice(), "Paiement de la commande ID: " + order.getId());
     }
 }

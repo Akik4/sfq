@@ -60,7 +60,18 @@ public class TablesController {
         });
         statusOrderColumn.setCellValueFactory(cellData -> {
             OrdersEntity order = cellData.getValue().getOrder();
-            return new SimpleStringProperty(order != null ? (order.getStatus() ? "Livré" : "En cours") : "...");
+            if (order == null) {
+                return new SimpleStringProperty("...");
+            }
+
+            int status = order.getStatus();
+            String statusText = switch (status) {
+                case 1 -> "Livré";
+                case 2 -> "Payé";
+                default -> "En cours";
+            };
+
+            return new SimpleStringProperty(statusText);
         });
         tablesTable.setItems(tables);
 
@@ -166,7 +177,7 @@ public class TablesController {
     }
 
     private void createOrder(double totalPrice, TablesEntity table, List<DishesEntity> selectedDishes, double totalPriceProduction) {
-        OrdersEntity newOrder = new OrdersEntity(new Date(), false, totalPrice,table , (int) totalPriceProduction);
+        OrdersEntity newOrder = new OrdersEntity(new Date(), 0, totalPrice,table , (int) totalPriceProduction);
         Transaction tx = null;
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {

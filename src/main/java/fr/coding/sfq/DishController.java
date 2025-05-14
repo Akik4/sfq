@@ -95,19 +95,7 @@ public class DishController {
         Text dishPrice = new Text(price + " €");
         dishPrice.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: green;");
 
-        ImageView dishImage;
-        try {
-            if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                dishImage = new ImageView(new Image(imageUrl));
-            } else {
-                throw new Exception();
-            }
-        } catch (Exception e) {
-            dishImage = new ImageView(getClass().getResource("/images/placeholder.png").toExternalForm());
-        }
-
-        dishImage.setFitWidth(120);
-        dishImage.setFitHeight(120);
+        ImageView dishImage = createDishImage(imageUrl, 120, 120);
 
         dishCard.getChildren().addAll(dishImage, dishName, dishDescription, dishPrice);
 
@@ -141,19 +129,7 @@ public class DishController {
             Text dishPrice = new Text(dish.getPrice() + " €");
             dishPrice.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: green;");
 
-            ImageView dishImage;
-            try {
-                if (dish.getImageURL() != null && !dish.getImageURL().trim().isEmpty()) {
-                    dishImage = new ImageView(new Image(dish.getImageURL(), true));
-                } else {
-                    throw new Exception();
-                }
-            } catch (Exception e) {
-                dishImage = new ImageView(getClass().getResource("/images/placeholder.png").toExternalForm());
-            }
-
-            dishImage.setFitWidth(150);
-            dishImage.setFitHeight(150);
+            ImageView dishImage = createDishImage(dish.getImageURL(), 150, 150);
 
             Button closeButton = new Button("Fermer");
             closeButton.setOnAction(event -> detailStage.close());
@@ -165,4 +141,20 @@ public class DishController {
             detailStage.show();
         });
     }
+    private ImageView createDishImage(String imageUrl, int width, int height) {
+        ImageView dishImage;
+        try {
+            if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                dishImage = new ImageView(new Image(imageUrl, true));
+            } else {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            dishImage = new ImageView(getClass().getResource("/images/placeholder.png").toExternalForm());
+        }
+        dishImage.setFitWidth(width);
+        dishImage.setFitHeight(height);
+        return dishImage;
+    }
+
 }

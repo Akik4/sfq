@@ -5,7 +5,12 @@
 <?import javafx.scene.shape.*?>
 
 <BorderPane fx:id="dashboard" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.coding.sfq.controllers.AllDashboardController">
-
+    <top>
+        <HBox spacing="10">
+            <Label text="Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
+            <Button text="Accueil" fx:id="homeButton"/>
+        </HBox>
+    </top>
     <!-- TableView for Last Orders -->
     <left>
         <TableView fx:id="ordersTable">
@@ -16,6 +21,19 @@
             </columns>
         </TableView>
     </left>
+
+    <right>
+        <VBox spacing="10" alignment="TOP_LEFT" style="-fx-padding: 20;">
+            <Label text="Commandes des dernières 24h :" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+            <Label text="En cours :" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+            <VBox fx:id="inProgressOrdersList" spacing="5"/>
+            <Label fx:id="inProgressTotalLabel" text="Total : 0 €" style="-fx-font-weight: bold;"/>
+
+            <Label text="Terminées :" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 20px 0 0 0" />
+            <VBox fx:id="finishedOrdersList" spacing="5"/>
+            <Label fx:id="finishedTotalLabel" text="Total : 0 €" style="-fx-font-weight: bold;"/>
+        </VBox>
+    </right>
 
     <!-- GridPane for Table Occupancy -->
     <center>

@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"m":"fr.coding.sfq","l":"fr.coding.sfq"},{"m":"fr.coding.sfq","l":"fr.coding.sfq.controllers"},{"m":"fr.coding.sfq","l":"fr.coding.sfq.util"}];updateSearchResults();

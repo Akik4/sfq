@@ -31,6 +31,13 @@ public class OrdersController {
 
     private final ObservableList<OrdersEntity> orders = FXCollections.observableArrayList();
 
+    /**
+     * Initializes the controller and configures the user interface.
+     * This method:
+     * - Configures table columns
+     * - Initializes event listeners
+     * - Loads orders from the database
+     */
     @FXML
     public void initialize() {
         homeButton.setOnAction(e -> MainController.getInstance().switchView("HomePage.fxml"));
@@ -139,6 +146,14 @@ public class OrdersController {
         actionsColumn.setCellFactory(cellFactory);
     }
 
+    /**
+     * Validates an order.
+     * This method:
+     * - Updates the order status
+     * - Adds an expense for production cost
+     * 
+     * @param order The order to validate
+     */
     private void validateOrder(OrdersEntity order) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
@@ -154,6 +169,14 @@ public class OrdersController {
         TransactionsUtil.addExpense(order.getPriceProduction(), "Prix Production des plats de la commande ID: " + order.getId());
     }
 
+    /**
+     * Cancels an order.
+     * This method:
+     * - Releases the associated table
+     * - Deletes the order from the database
+     * 
+     * @param order The order to cancel
+     */
     private void cancelOrder(OrdersEntity order) {
 
         // Step1
@@ -189,6 +212,15 @@ public class OrdersController {
         }
     }
 
+    /**
+     * Processes payment for an order.
+     * This method:
+     * - Adds income for the order amount
+     * - Releases the table
+     * - Updates the order status
+     * 
+     * @param order The order to pay
+     */
     private void payOrder(OrdersEntity order) {
         TransactionsUtil.addIncome(order.getPrice(), "Paiement de la commande ID: " + order.getId());
         Step1(order);

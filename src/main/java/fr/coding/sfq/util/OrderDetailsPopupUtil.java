@@ -13,8 +13,20 @@ import org.hibernate.Session;
 
 import java.util.List;
 
+/**
+ * Utility for displaying order details in a popup window.
+ * This class manages the display of detailed order information, including:
+ * - List of ordered dishes
+ * - Dish descriptions and prices
+ * - Total order price
+ */
 public class OrderDetailsPopupUtil {
 
+    /**
+     * Shows a popup window with order details.
+     * 
+     * @param order The order to display details for
+     */
     public static void show(OrdersEntity order) {
         Stage detailStage = new Stage();
         detailStage.setTitle("Détails de la commande #" + order.getId());

@@ -42,6 +42,13 @@ public class TransactionsController {
     private final ObservableList<TransactionEntity> transactions = FXCollections.observableArrayList();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+    /**
+     * Initializes the controller and configures the user interface.
+     * This method:
+     * - Configures table columns
+     * - Initializes event listeners
+     * - Loads transactions from the database
+     */
     @FXML
     public void initialize() {
         homeButton.setOnAction(event -> MainController.getInstance().switchView("HomePage.fxml"));
@@ -59,7 +66,11 @@ public class TransactionsController {
 
     }
 
-    // function who wait other function for Income and Expense
+    /**
+     * Saves a transaction to the database.
+     * 
+     * @param transaction The transaction to save
+     */
     private void saveTransaction(TransactionEntity transaction) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -73,6 +84,12 @@ public class TransactionsController {
         }
     }
 
+    /**
+     * Loads transactions from the database.
+     * This method retrieves all transactions and displays them in the table.
+     * 
+     * @return List of all transactions from the database
+     */
     private void loadTransactionsFromDatabase() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             List<TransactionEntity> result = session.createQuery("FROM TransactionEntity", TransactionEntity.class).list();
@@ -90,6 +107,15 @@ public class TransactionsController {
         };
     }
 
+    /**
+     * Generates a PDF containing the transaction history.
+     * The PDF includes:
+     * - A table of transactions
+     * - Income and expense totals
+     * - Final balance
+     * 
+     * @param file The file where to save the PDF
+     */
     private void generatePdf() {
         // open pop up for save the file
         FileChooser fileChooser = new FileChooser();

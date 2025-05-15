@@ -10,6 +10,13 @@ import org.hibernate.Session;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Controller for the main dashboard.
+ * This class displays key statistics about:
+ * - Employee age distribution
+ * - Menu pricing information
+ * - Total menu value
+ */
 public class DashboardController {
     @FXML private Label under30Label;
     @FXML private Label between30And45Label;
@@ -19,6 +26,14 @@ public class DashboardController {
     @FXML private Label cheapestDishLabel;
     @FXML private Label totalMenuValueLabel;
 
+    /**
+     * Initializes the dashboard controller.
+     * This method:
+     * - Loads employee statistics
+     * - Calculates age distribution
+     * - Loads and displays menu pricing information
+     * - Calculates total menu value
+     */
     @FXML
     public void initialize() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {

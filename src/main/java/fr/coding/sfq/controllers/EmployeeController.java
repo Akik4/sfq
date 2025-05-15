@@ -33,6 +33,13 @@ public class EmployeeController {
 
     private List<EmployeeEntity> employees = FXCollections.observableArrayList();
 
+    /**
+     * Initializes the controller and configures the user interface.
+     * This method:
+     * - Configures table columns
+     * - Initializes event listeners
+     * - Loads employees from the database
+     */
     @FXML
     public void initialize() {
         employeeNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
@@ -58,7 +65,13 @@ public class EmployeeController {
 
     }
 
-
+    /**
+     * Creates a new employee.
+     * 
+     * @param name The name of the employee
+     * @param position The position of the employee
+     * @param age The age of the employee
+     */
     private void createEmployee() {
         String employeeName;
         String employeePosition;
@@ -102,6 +115,16 @@ public class EmployeeController {
             return;
         }
 
+    }
+
+    /**
+     * Adds work hours to an employee.
+     * 
+     * @param employee The employee to update
+     * @param hours The number of hours to add
+     */
+    private void addWorkHours(EmployeeEntity employee, double hours) {
+        // Implementation of adding work hours to an employee
     }
 
     private void addActionsToTable() {

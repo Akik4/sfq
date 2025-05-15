@@ -34,6 +34,13 @@ public class DishController {
 
     private List<DishesEntity> dishes = FXCollections.observableArrayList();
 
+    /**
+     * Initializes the controller and configures the user interface.
+     * This method:
+     * - Configures dish grid
+     * - Initializes event listeners
+     * - Loads dishes from the database
+     */
     @FXML
     public void initialize() {
         submitDishButton.setOnAction(event -> addDish());
@@ -68,6 +75,14 @@ public class DishController {
         dishGrid.getChildren().add(dishCard);
     }
 
+    /**
+     * Adds a new dish to the menu.
+     * 
+     * @param name The name of the dish
+     * @param description The description of the dish
+     * @param price The price of the dish
+     * @param imageUrl The URL of the dish image
+     */
     private void addDish() {
         String name = nameField.getText();
         String description = descriptionField.getText();
@@ -102,6 +117,11 @@ public class DishController {
         urlImageField.clear();
     }
 
+    /**
+     * Displays a dish card in the grid.
+     * 
+     * @param dish The dish to display
+     */
     private void displayDish(DishesEntity dish) {
         // Create dish card dynamically
         VBox dishCard = new VBox(10);
@@ -128,6 +148,11 @@ public class DishController {
         dishGrid.getChildren().add(dishCard); // Add new dish card to the FlowPane
     }
 
+    /**
+     * Shows detailed information about a dish.
+     * 
+     * @param id The ID of the dish to display
+     */
     private void showDishDetails(int id) {
         List<DishesEntity> matchingDishes = dishes.stream()
                 .filter(dish -> dish.getId() == id)

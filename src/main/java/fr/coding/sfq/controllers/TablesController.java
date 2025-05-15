@@ -43,6 +43,13 @@ public class TablesController {
     private ObservableList<TablesEntity> tables = FXCollections.observableArrayList();
     private List<DishesEntity> dishes = FXCollections.observableArrayList();
 
+    /**
+     * Initializes the controller and configures the user interface.
+     * This method:
+     * - Configures table columns
+     * - Initializes event listeners
+     * - Loads table data from the database
+     */
     @FXML
     public void initialize() {
         tableNumberColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLocation()));
@@ -123,6 +130,15 @@ public class TablesController {
         }
     }
 
+    /**
+     * Marks a table as available.
+     * This method:
+     * - Updates the table status
+     * - Removes associated order if present
+     * - Refreshes the display
+     * 
+     * @param selectedTable The table to mark as available
+     */
     private void markTableAvailable() {
         TablesEntity selectedTable = tablesTable.getSelectionModel().getSelectedItem();
         if (selectedTable != null) {
@@ -152,14 +168,20 @@ public class TablesController {
         }
     }
 
-    private void createTable() {
+    /**
+     * Creates a new table in the restaurant.
+     * 
+     * @param tableNumber The number of the new table
+     * @return The newly created table entity
+     */
+    private TablesEntity createTable() {
         String tableNumber;
 
         try {
             tableNumber = tableNumberField.getText();
         } catch (NumberFormatException e) {
             System.out.println("Numéro de table invalide !");
-            return;
+            return null;
         }
 
         TablesEntity newTable = new TablesEntity(4, tableNumber, false);
@@ -175,8 +197,17 @@ public class TablesController {
         tables.add(newTable);
         tablesTable.refresh();
         tableNumberField.clear();
+        return newTable;
     }
 
+    /**
+     * Creates a new order for a table.
+     * 
+     * @param totalPrice The total price of the order
+     * @param table The concerned table
+     * @param selectedDishes The list of selected dishes
+     * @param totalPriceProduction The total production cost
+     */
     private void createOrder(double totalPrice, TablesEntity table, List<DishesEntity> selectedDishes, double totalPriceProduction) {
 
         OrdersEntity newOrder = new OrdersEntity(new Date(), 0, totalPrice,table , (int) totalPriceProduction);

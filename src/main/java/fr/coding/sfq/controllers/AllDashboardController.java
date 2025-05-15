@@ -24,6 +24,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controller for the comprehensive dashboard.
+ * This class provides a detailed overview of:
+ * - Current orders
+ * - Recent orders
+ * - Table status
+ * - Order statistics
+ */
 public class AllDashboardController {
 
     @FXML
@@ -54,7 +62,15 @@ public class AllDashboardController {
     ObservableList<TablesEntity> tables = FXCollections.observableArrayList();
     ObservableList<OrdersEntity> orders = FXCollections.observableArrayList();
 
-
+    /**
+     * Initializes the controller and loads all dashboard data.
+     * This method:
+     * - Loads table orders
+     * - Loads recent orders
+     * - Loads last client information
+     * - Loads last order details
+     */
+    @FXML
     public void initialize() {
         Platform.runLater(() -> {
             try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -72,6 +88,13 @@ public class AllDashboardController {
         });
     }
 
+    /**
+     * Loads and displays all current orders in the table.
+     * This method:
+     * - Configures table columns
+     * - Sets up cell value factories
+     * - Populates the table with data
+     */
     private void loadOrders() {
         TableNo.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getLocation()));
 
@@ -81,6 +104,12 @@ public class AllDashboardController {
         ordersTable.setItems(tableOrder);
     }
 
+    /**
+     * Loads and displays information about the last served client.
+     * This method:
+     * - Retrieves the last 5 served orders
+     * - Displays order details including dishes
+     */
     private void loadLastClient() {
         VBox box = new VBox();
         Label titre = new Label("Commande servie : ");
@@ -141,6 +170,13 @@ public class AllDashboardController {
         });
     }
 
+    /**
+     * Loads and displays the most recent orders.
+     * This method:
+     * - Retrieves orders from the last 24 hours
+     * - Separates orders by status (in progress/finished)
+     * - Calculates and displays totals
+     */
     private void loadRecentOrders() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             LocalDate now = LocalDate.now();

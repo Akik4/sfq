@@ -70,6 +70,7 @@ public class OrdersController {
         }
     }
 
+    // add button for different option on order
     private void addActionsToTable() {
         Callback<TableColumn<OrdersEntity, Void>, TableCell<OrdersEntity, Void>> cellFactory = new Callback<>() {
             @Override
@@ -82,11 +83,13 @@ public class OrdersController {
                     private final HBox hBox = new HBox(5,payButton, validateButton, cancelButton);
 
                     {
+                        // style button
                         payButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white;");
                         validateButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
                         cancelButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
                         payButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white;");
 
+                        // action button who call different function define under
                         payButton.setOnAction(event -> {
                             OrdersEntity order = getTableView().getItems().get(getIndex());
                             payOrder(order);

@@ -29,7 +29,7 @@ import java.util.List;
 
 public class TransactionsController {
 
-    // Liens avec FXML
+    // Link with Fxml
     @FXML private TableView<TransactionEntity> transactionsTable;
     @FXML private TableColumn<TransactionEntity, String> typeColumn;
     @FXML private TableColumn<TransactionEntity, String> dateColumn;
@@ -38,7 +38,7 @@ public class TransactionsController {
     @FXML private Button homeButton;
     @FXML private Button downloadPdfButton;
 
-    // Liste observable + format de date
+    // List + format date
     private final ObservableList<TransactionEntity> transactions = FXCollections.observableArrayList();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -51,15 +51,15 @@ public class TransactionsController {
         dateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTimestamp().format(formatter)));
         amountColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getAmount()));
         descriptionColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription()));
-        // Lier à la table
+
         transactionsTable.setItems(transactions);
 
-        // Fonction qui Select toute la BDD et qui Add a la liste qui affiche les transactions
+        // Function check bdd and add to the list for show on front
         loadTransactionsFromDatabase();
 
     }
 
-    // Fonction qui attend une autre fonction pour add Expense or Income dans la BDD
+    // function who wait other function for Income and Expense
     private void saveTransaction(TransactionEntity transaction) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -73,7 +73,6 @@ public class TransactionsController {
         }
     }
 
-    // Fonction qui Select toute la BDD et qui Add a la liste qui affiche les transactions
     private void loadTransactionsFromDatabase() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             List<TransactionEntity> result = session.createQuery("FROM TransactionEntity", TransactionEntity.class).list();
@@ -83,7 +82,7 @@ public class TransactionsController {
         }
     }
 
-    // pour transformer Income et Expense en Recette et Depense pour le visuel en Francais dans le front
+    // switch for show Recette or Depense in front
     private String getTypeLabel(TransactionEntity.Type type) {
         return switch (type) {
             case INCOME -> "Recette";
@@ -92,7 +91,7 @@ public class TransactionsController {
     }
 
     private void generatePdf() {
-        // Ouvre un pop up opur choisir où enregistrer le fichier
+        // open pop up for save the file
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Enregistrer le PDF des transactions");
         fileChooser.setInitialFileName("transactions.pdf");
@@ -100,34 +99,33 @@ public class TransactionsController {
 
 
         File file = fileChooser.showSaveDialog(transactionsTable.getScene().getWindow());
-        if (file == null) return; // Si l'user quitte on ferme tout
+        if (file == null) return; // if user leave we close the pop up
 
         try {
             Document document = new Document();
             PdfWriter.getInstance(document, new FileOutputStream(file));
             document.open();
 
-            // Ajout du titre au pdf
+            // add title for the pdf
             document.add(new Paragraph("Historique des transactions\n\n"));
 
-            // Création du tableau à 4 colonnes
+            // create table with 4 colmun
             PdfPTable table = new PdfPTable(4);
-            // Style du tableau
+            // Style table
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
             table.setSpacingAfter(10f);
 
-            // headers du tableau
+            // headers for table
             String[] headers = {"Type", "Date", "Montant (€)", "Description"};
             for (String header : headers) {
                 PdfPCell headerCell = new PdfPCell(new Paragraph(header));
-                // Style des cellules
                 headerCell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                 headerCell.setPadding(10f);
                 table.addCell(headerCell);
             }
 
-            // Variable pour compter le resultat des transactions
+            // Variable to count the result of transactions
             double totalIncome = 0;
             double totalExpense = 0;
 
@@ -142,7 +140,7 @@ public class TransactionsController {
                 dateCell.setPadding(8f);
                 table.addCell(dateCell);
 
-                // Cellule Montant different car rajout couleur en fonction de Income ou Expense + ajout montant a la variable du debut
+                // Cell Amount different because color added depending on Income or Expense + amount added to the variable at the start
                 Paragraph amountPara = new Paragraph(String.format("%.2f €", t.getAmount()));
                 if (t.getType() == TransactionEntity.Type.INCOME) {
                     amountPara.getFont().setColor(0, 128, 0);
@@ -162,11 +160,11 @@ public class TransactionsController {
                 table.addCell(descCell);
             }
 
-            // Ajout le tableau au pdf
+            // add table on pdf
             document.add(table);
             document.add(new Paragraph("\nRécapitulatif :\n"));
 
-            // Ligne "Total Recettes"
+            // line "Total Recettes"
             Paragraph incomeLine = new Paragraph();
             com.lowagie.text.Font greenFont = new com.lowagie.text.Font();
             greenFont.setColor(0, 128, 0);
@@ -175,7 +173,7 @@ public class TransactionsController {
             incomeLine.add(new com.lowagie.text.Chunk(String.format(" : %.2f €", totalIncome), greenFont));
             document.add(incomeLine);
 
-            // Ligne "Total Dépenses"
+            // line "Total Dépenses"
             Paragraph expenseLine = new Paragraph();
             com.lowagie.text.Font redFont = new com.lowagie.text.Font();
             redFont.setColor(200, 0, 0);
@@ -184,7 +182,7 @@ public class TransactionsController {
             expenseLine.add(new com.lowagie.text.Chunk(String.format(" : %.2f €", totalExpense), redFont));
             document.add(expenseLine);
 
-            // Calcul + affichage du resultat
+            // Calculation + display of the result
             double balance = totalIncome - totalExpense;
             Paragraph balanceLine = new Paragraph("Solde Final : " + String.format("%.2f €", balance));
             balanceLine.setSpacingBefore(5f);

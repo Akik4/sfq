@@ -7,9 +7,12 @@ import javafx.scene.control.Label;
 
 public class CountdownTimerUtil extends Thread {
 
+    // Timer duration in seconds (25 minutes)
     private static int value = 25 * 60;
+
     private final Label label;
 
+    // var to indicate if the "Create Order" button should be disabled
     private static final BooleanProperty shouldDisableOrderButton = new SimpleBooleanProperty(false);
 
     public CountdownTimerUtil(Label label) {
@@ -26,6 +29,7 @@ public class CountdownTimerUtil extends Thread {
 
     @Override
     public void run() {
+        // Timer loop that runs until value >= 0
         while (value >= 0) {
             int minutes = value / 60;
             int seconds = value % 60;
@@ -41,7 +45,7 @@ public class CountdownTimerUtil extends Thread {
                 break;
             }
 
-            value--;
+            value--; // Decrement the timer
         }
 
         Platform.runLater(() -> label.setText("Terminé !"));
